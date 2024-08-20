@@ -1,0 +1,65 @@
+
+@media screen and (min-width:1400px) {
+	nav{position: fixed;width: 0;height: calc(100% - 5.375rem);z-index: 9;box-shadow: rgba(0,0,0, .5) 0 .25rem  0.5rem;background-color: #fff;left: 0.4375rem;top-btn:5.375rem;
+		& + .nav-bg{display: none;}
+		.user-section{background-color: #6f002c;
+			.user-pic{color: #6e002b}
+		}
+		/*.nav-section {
+			.nav-item{color:#c2185b;border-bottom: #e6c5d2 solid 0.0625rem;
+				i{color: #333}
+				&:active,.active{background-color: #eabdce;}
+			}
+		}*/
+	}
+	nav.active ~ section.wraper,section.wraper.open-nav{padding-left: 19.1875rem;}
+}
+@media screen and (max-width:1300px){
+	section.wraper{
+		.edit-view{
+			&.active{width:22rem;min-width: 22rem;}
+		}
+	}
+	section.open-edit{
+		.table-action {
+			.text-btn-part{display: none;}
+			.icon-btn-part{display:flex;}
+		}
+	}
+}
+@media screen and (max-width:1000px){
+	.table-action {
+		.text-btn-part{display: none;}
+		.icon-btn-part{display:flex;}
+	}
+}
+@media screen and (max-width:600px) {
+	.login-container{
+		.log-box{width:15.25rem;padding:1rem;
+			.log-key{padding: 3.906vw 0;
+				li{margin: 0 1.367vw;width:0.5rem;height:0.5rem;}
+			}
+			.log-num{
+				li{padding: 0; width:4rem;height:4rem;font-size:  1.25rem;}
+			}
+		}
+	}
+	header{
+		.search-box{width: 100%;display: none;
+			&.active{display: block;}
+		}
+		.top-btn{justify-content: space-between;}
+	}
+	section.table-main{overflow: auto;padding-top: 6.25rem;
+		.table-list{min-height: 100%;overflow: visible;
+			table{display: block;width: 100%;
+				tr.mat-header-row{display: none}
+				tr.mat-row{display: block;width: 100%;height: auto;border-bottom: rgba(0, 0, 0, 0.12) solid 0.0625rem;
+					td.mat-cell{display: block;width: 100%;border-bottom:none;text-align: right;padding:0.25rem 0.5rem; padding-left: 50%;position: relative;
+						&:before{content:attr(data-label);position: absolute;left: 0.25rem;height: 1.25rem;line-height: 1.25rem;display: block;width: 43%;text-align: left;color:#666;font-weight: 600;    white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
+					}
+				}
+			}
+		}
+	}
+}

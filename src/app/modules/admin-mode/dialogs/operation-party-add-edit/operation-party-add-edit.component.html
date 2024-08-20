@@ -1,0 +1,40 @@
+<div class="pop-heading" mat-dialog-title>{{dialogTitle}}
+  <div class="d-inline-flex">
+    <button mat-icon-button  (click)="_dialogRef.close()"><i class="icon-cursor"></i></button>
+  </div>
+</div>
+<form [formGroup]="addModuleForm" (ngSubmit)="onSubmit()">
+  <div mat-dialog-content>
+    <div class="box">
+      <div class="row">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline">
+            <mat-label>Operation Part name*</mat-label>
+            <input matInput formControlName="operationPartyname">
+            <mat-error *ngIf="(f.operationPartyname.touched || f.operationPartyname.dirty || submitted)">
+              <span *ngIf="f.operationPartyname.errors?.required">Operation Part name is required.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+
+
+
+          <ng-select placeholder="Party Role Assignment" [dropdownPosition]="'bottom'" [addTag]="false"
+          [items]="partyRoleAssignment" bindLabel="text" bindValue="id" appendTo="body"
+          formControlName="partyRoleAssignmentID">
+          <ng-template ng-tag-tmp let-search="searchTerm">
+            <b [ngStyle]="{'color': '#0000FF'}">Add new Party Role Assignment</b>: {{search}}
+          </ng-template>
+        </ng-select>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div mat-dialog-actions class="pop-footer">
+      <button mat-flat-button color="accent"  cdkFocusInitial  type="submit"
+      [ngClass]="{'btn-loader': isLoading}">{{btnValue}}<i [hidden]="isLoading"></i></button>
+    <button  mat-stroked-button  class="ml-auto" cdkFocusInitial (click)="backProgress()">Cancel</button>
+  </div>
+</form>

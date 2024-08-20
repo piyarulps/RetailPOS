@@ -1,0 +1,566 @@
+<div class="edit-view-heading">
+	{{dialogTitle}}
+</div>
+<div class="edit-view-body">
+	<mat-radio-group [(ngModel)]="partyType" [ngModelOptions]="{standalone: true}" [disabled]="editData.length > 0"
+		aria-label="Type">
+		<mat-radio-button value="Organization" color="accent" [checked]="partyType == 'Organization'" class="mr-2">
+			Organization
+		</mat-radio-button>
+		<mat-radio-button value="Person" color="accent" [checked]="partyType == 'Person'">
+			Person
+		</mat-radio-button>
+	</mat-radio-group>
+</div>
+
+<form novalidate [formGroup]="orgForm" #orgFormDirective="ngForm" [hidden]="partyType != 'Organization'"
+	(keyup)="setPreData()">
+	<div class="edit-view-heading">
+		Basic Information
+	</div>
+	<div class="edit-view-body">
+
+		<div [hidden]="editData.length && editData.length > 1">
+			<div *ngIf="editData.length && editData.length == 1; else selectbox;">
+				<mat-form-field appearance="outline">
+					<mat-label>Legal Name*</mat-label>
+					<input matInput formControlName="LegalName">
+					<mat-error *ngIf="(orgForm.controls.LegalName.touched || orgForm.controls.LegalName.dirty)">
+						<span *ngIf="orgForm.controls.LegalName.errors?.required">Legal Name is
+							required.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<ng-template #selectbox>
+				<div class="ng-select-wrapper">
+					<ng-select
+						[ngClass]="{'ng-error':(orgForm.controls.LegalName.touched || orgForm.controls.LegalName.dirty || orgFormSubmitted) && orgForm.controls.LegalName.errors?.required}"
+						placeholder="Legal Name*" [addTag]="addTag" [clearOnBackspace]="true"
+						[dropdownPosition]="'bottom'" [items]="LegalNameDropDownList"
+						bindLabel="_source.ManufacturerName" bindValue="_source.ManufacturerName"
+						[loading]="LegalNameLoading" formControlName="LegalName" (change)="onSelectLegalName($event)"
+						(keyup)="onLegalNameSearch($event)">
+						<ng-template ng-tag-tmp let-search="searchTerm">
+							<b [ngStyle]="{'color': '#0000FF'}">Add new legal name</b>: {{search}}
+						</ng-template>
+					</ng-select>
+					<mat-error
+						*ngIf="(orgForm.controls.LegalName.touched || orgForm.controls.LegalName.dirty || orgFormSubmitted)">
+						<span *ngIf="orgForm.controls.LegalName.errors?.required">Legal Name is
+							required.</span>
+					</mat-error>
+				</div>
+			</ng-template>
+		</div>
+
+		<div [hidden]="editData.length && editData.length > 1">
+			<mat-form-field appearance="outline">
+				<mat-label>Trade Name</mat-label>
+				<input matInput formControlName="TradeName">
+			</mat-form-field>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(orgForm.controls.LegalStatusCode.touched || orgForm.controls.LegalStatusCode.dirty) && orgForm.controls.LegalStatusCode.errors?.required}"
+				placeholder="Legal Status Type" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="LegalStatusTypeList" bindLabel="LegalStatusCode" bindValue="id"
+				formControlName="LegalStatusCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new legal status type</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Tax Exemption</mat-label>
+			<input matInput formControlName="TaxExemptOrganizationTypeCode">
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>DUNS Number</mat-label>
+			<input matInput formControlName="DUNSNumber">
+			<mat-error *ngIf="(orgForm.controls.DUNSNumber.touched || orgForm.controls.DUNSNumber.dirty)">
+				<span *ngIf="orgForm.controls.DUNSNumber.errors?.pattern">Enter a valid DNUS
+					Number.</span>
+			</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Fiscal Year End Date (MM/DD/YYYY)</mat-label>
+			<input matInput formControlName="FiscalYearEndDate" [matDatepicker]="picker_FiscalYearEndDate"
+				(focus)="_openCalendar(picker_FiscalYearEndDate)" (click)="_openCalendar(picker_FiscalYearEndDate)">
+			<mat-datepicker #picker_FiscalYearEndDate></mat-datepicker>
+			<mat-error *ngIf="(orgForm.controls.FiscalYearEndDate.touched || orgForm.controls.FiscalYearEndDate.dirty)">
+				<span *ngIf="orgForm.controls.FiscalYearEndDate.errors?.pattern">Enter a valid
+					Date.</span>
+			</mat-error>
+		</mat-form-field>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(orgForm.controls.LegalOrganizationTypeCode.touched || orgForm.controls.LegalOrganizationTypeCode.dirty) && orgForm.controls.LegalOrganizationTypeCode.errors?.required}"
+				placeholder="Legal Organization Type" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="LegalOrganizationTypeList" bindLabel="LegalOrgnizationTypeCode"
+				bindValue="id" formControlName="LegalOrganizationTypeCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new legal organization type</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+	</div>
+	<div class="edit-view-heading">
+		Other Information
+	</div>
+	<div class="edit-view-body">
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(orgForm.controls.GlobalBusinessSizeTypeCode.touched || orgForm.controls.GlobalBusinessSizeTypeCode.dirty) && orgForm.controls.GlobalBusinessSizeTypeCode.errors?.required}"
+				placeholder="Global Business Size Type" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="GlobalBusinessSizeTypeList"
+				bindLabel="GlobalBusinessSizeTypeCode" bindValue="id" formControlName="GlobalBusinessSizeTypeCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new global business size</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Description</mat-label>
+			<input matInput formControlName="ActualOrgDescription">
+		</mat-form-field>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(orgForm.controls.ReligionName.touched || orgForm.controls.ReligionName.dirty) && orgForm.controls.ReligionName.errors?.required}"
+				placeholder="Religion Name" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="ReligionNameList" bindLabel="ReligionName" bindValue="id"
+				formControlName="ReligionName">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new religion name</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(orgForm.controls.BusinessActivityCode.touched || orgForm.controls.BusinessActivityCode.dirty) && orgForm.controls.BusinessActivityCode.errors?.required}"
+				placeholder="Business Activity" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="BusinessActivityCodeList" bindLabel="BusinessActivityCode"
+				bindValue="id" formControlName="BusinessActivityCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new business activity</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Employee Count (Local)</mat-label>
+			<input matInput formControlName="EmployeeCountLocal">
+			<mat-error
+				*ngIf="(orgForm.controls.EmployeeCountLocal.touched || orgForm.controls.EmployeeCountLocal.dirty)">
+				<span *ngIf="orgForm.controls.EmployeeCountLocal.errors?.pattern">Enter a valid
+					count.</span>
+			</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Employee Count (Global)</mat-label>
+			<input matInput formControlName="EmployeeCountGlobal">
+			<mat-error
+				*ngIf="(orgForm.controls.EmployeeCountGlobal.touched || orgForm.controls.EmployeeCountGlobal.dirty || orgFormSubmitted)">
+				<span *ngIf="orgForm.controls.EmployeeCountGlobal.errors?.pattern">Enter a valid
+					count.</span>
+				<span *ngIf="orgForm.controls.EmployeeCountGlobal.errors?.isInvalid">Global Employee Count must be
+					greater than Local Employee Count.</span>
+			</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Local Annual Revenue Amount</mat-label>
+			<input matInput formControlName="LocalAnnualRevenueAmount">
+			<mat-error
+				*ngIf="(orgForm.controls.LocalAnnualRevenueAmount.touched || orgForm.controls.LocalAnnualRevenueAmount.dirty)">
+				<span *ngIf="orgForm.controls.LocalAnnualRevenueAmount.errors?.pattern">Enter a valid amount.</span>
+			</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Global Annual Revenue Amount</mat-label>
+			<input matInput formControlName="GlobalAnnualRevenueAmount">
+			<mat-error
+				*ngIf="(orgForm.controls.GlobalAnnualRevenueAmount.touched || orgForm.controls.GlobalAnnualRevenueAmount.dirty || orgFormSubmitted)">
+				<span *ngIf="orgForm.controls.GlobalAnnualRevenueAmount.errors?.pattern">Enter a
+					valid amount.</span>
+				<span *ngIf="orgForm.controls.GlobalAnnualRevenueAmount.errors?.isInvalid">Global Annual Revenue must be
+					greater than Local Annual Revenue Amount.</span>
+			</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Open For Business Date (MM/DD/YYYY)</mat-label>
+			<input matInput formControlName="OpenForBusinessDate" [matDatepicker]="picker_OpenForBusinessDate"
+				(focus)="_openCalendar(picker_OpenForBusinessDate)" (click)="_openCalendar(picker_OpenForBusinessDate)">
+			<mat-datepicker #picker_OpenForBusinessDate></mat-datepicker>
+			<mat-error
+				*ngIf="(orgForm.controls.OpenForBusinessDate.touched || orgForm.controls.OpenForBusinessDate.dirty)">
+				<span *ngIf="orgForm.controls.OpenForBusinessDate.errors?.pattern">Enter a valid
+					date.</span>
+			</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Closed For Business Date (MM/DD/YYYY)</mat-label>
+			<input matInput formControlName="ClosedForBusinessDate" [matDatepicker]="picker_ClosedForBusinessDate"
+				(focus)="_openCalendar(picker_ClosedForBusinessDate)"
+				(click)="_openCalendar(picker_ClosedForBusinessDate)">
+			<mat-datepicker #picker_ClosedForBusinessDate></mat-datepicker>
+			<mat-error
+				*ngIf="(orgForm.controls.ClosedForBusinessDate.touched || orgForm.controls.ClosedForBusinessDate.dirty)">
+				<span *ngIf="orgForm.controls.ClosedForBusinessDate.errors?.pattern">Enter a
+					valid
+					date.</span>
+			</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Bankruptcy Flag</mat-label>
+			<mat-select formControlName="BankruptcyFlag">
+				<mat-option>None</mat-option>
+				<mat-option value="1">True</mat-option>
+				<mat-option value="0">False</mat-option>
+			</mat-select>
+		</mat-form-field>
+
+		<div [hidden]="orgForm.value.BankruptcyFlag != 1">
+			<mat-form-field appearance="outline">
+				<mat-label>Bankruptcy Date (MM/DD/YYYY)</mat-label>
+				<input matInput formControlName="BankruptcyDate" [matDatepicker]="picker_BankruptcyDate"
+					(focus)="_openCalendar(picker_BankruptcyDate)" (click)="_openCalendar(picker_BankruptcyDate)">
+				<mat-datepicker #picker_BankruptcyDate></mat-datepicker>
+				<mat-error *ngIf="(orgForm.controls.BankruptcyDate.touched || orgForm.controls.BankruptcyDate.dirty)">
+					<span *ngIf="orgForm.controls.BankruptcyDate.errors?.pattern">Enter a valid
+						date.</span>
+				</mat-error>
+			</mat-form-field>
+		</div>
+
+		<div [hidden]="orgForm.value.BankruptcyFlag != 1">
+			<mat-form-field appearance="outline">
+				<mat-label>Bankruptcy Emergence Date (MM/DD/YYYY)</mat-label>
+				<input matInput formControlName="BankruptcyEmergenceDate"
+					[matDatepicker]="picker_BankruptcyEmergenceDate"
+					(focus)="_openCalendar(picker_BankruptcyEmergenceDate)"
+					(click)="_openCalendar(picker_BankruptcyEmergenceDate)">
+				<mat-datepicker #picker_BankruptcyEmergenceDate></mat-datepicker>
+				<mat-error
+					*ngIf="(orgForm.controls.BankruptcyEmergenceDate.touched || orgForm.controls.BankruptcyEmergenceDate.dirty)">
+					<span *ngIf="orgForm.controls.BankruptcyEmergenceDate.errors?.pattern">Enter a
+						valid date.</span>
+				</mat-error>
+			</mat-form-field>
+		</div>
+
+		<div [hidden]="orgForm.value.BankruptcyFlag != 1">
+			<mat-form-field appearance="outline">
+				<mat-label>Bankruptcy Type</mat-label>
+				<input matInput formControlName="BankruptcyTypeCode">
+			</mat-form-field>
+		</div>
+	</div>
+</form>
+
+<form novalidate [formGroup]="perForm" #perFormDirective="ngForm" [hidden]="partyType != 'Person'"
+	(keyup)="setPreData()">
+	<div class="edit-view-heading">
+		Basic Information
+	</div>
+	<div class="edit-view-body">
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.Salutation.touched || perForm.controls.Salutation.dirty) && perForm.controls.Salutation.errors?.required}"
+				placeholder="Salutation" [addTag]="addTagCommon" [clearOnBackspace]="true" [dropdownPosition]="'bottom'"
+				[items]="SalutationList" bindLabel="Salutation" bindValue="id" formControlName="Salutation">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new salutation</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div [hidden]="editData.length && editData.length > 1">
+			<mat-form-field appearance="outline">
+				<mat-label>First Name*</mat-label>
+				<input matInput formControlName="FirstName">
+				<mat-error
+					*ngIf="(perForm.controls.FirstName.touched || perForm.controls.FirstName.dirty || perFormSubmitted)">
+					<span *ngIf="perForm.controls.FirstName.errors?.required">First Name is
+						required.</span>
+				</mat-error>
+			</mat-form-field>
+		</div>
+
+		<div [hidden]="editData.length && editData.length > 1">
+			<mat-form-field appearance="outline">
+				<mat-label>Middle Name</mat-label>
+				<input matInput formControlName="MiddleNames">
+			</mat-form-field>
+		</div>
+
+		<div [hidden]="editData.length && editData.length > 1">
+			<mat-form-field appearance="outline">
+				<mat-label>Last Name</mat-label>
+				<input matInput formControlName="LastName">
+				<mat-error *ngIf="(perForm.controls.LastName.touched || perForm.controls.LastName.dirty)">
+					<span *ngIf="perForm.controls.LastName.errors?.required">Last Name is
+						required.</span>
+				</mat-error>
+			</mat-form-field>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.GenderTypeCode.touched || perForm.controls.GenderTypeCode.dirty) && perForm.controls.GenderTypeCode.errors?.required}"
+				placeholder="Gender" [addTag]="addTagCommon" [clearOnBackspace]="true" [dropdownPosition]="'bottom'"
+				[items]="GenderTypeList" bindLabel="GenderTypeCode" bindValue="id" formControlName="GenderTypeCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new gender</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Date of Birth (MM/DD/YYYY)</mat-label>
+			<input matInput formControlName="DateOfBirth" [matDatepicker]="picker_DateOfBirth" [max]="dobMinDate"
+				(focus)="_openCalendar(picker_DateOfBirth)" (click)="_openCalendar(picker_DateOfBirth)">
+			<mat-datepicker #picker_DateOfBirth></mat-datepicker>
+			<mat-error *ngIf="(perForm.controls.DateOfBirth.touched || perForm.controls.DateOfBirth.dirty)">
+				<span *ngIf="perForm.controls.DateOfBirth.errors">Enter a valid
+					Date.</span>
+			</mat-error>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Suffix</mat-label>
+			<input matInput formControlName="Suffix">
+		</mat-form-field>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.MaritalStatusCode.touched || perForm.controls.MaritalStatusCode.dirty) && perForm.controls.MaritalStatusCode.errors?.required}"
+				placeholder="Marital Status" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="MaritalStatusCodeList" bindLabel="MaritalStatusCode"
+				bindValue="id" formControlName="MaritalStatusCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new marital status</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Sorting Name</mat-label>
+			<input matInput formControlName="SortingName">
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Mailing Name</mat-label>
+			<input matInput formControlName="MailingName">
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Official Name</mat-label>
+			<input matInput formControlName="OfficialName">
+		</mat-form-field>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.LifeStageCode.touched || perForm.controls.LifeStageCode.dirty) && perForm.controls.LifeStageCode.errors?.required}"
+				placeholder="Life Stage" [addTag]="addTagCommon" [clearOnBackspace]="true" [dropdownPosition]="'bottom'"
+				[items]="LifeStageCodeList" bindLabel="LifeStageCode" bindValue="id" formControlName="LifeStageCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new life stage</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.RaceCode.touched || perForm.controls.RaceCode.dirty) && perForm.controls.RaceCode.errors?.required}"
+				placeholder="Race Code" [addTag]="addTagCommon" [clearOnBackspace]="true" [dropdownPosition]="'bottom'"
+				[items]="RaceCodeList" bindLabel="RaceCode" bindValue="id" formControlName="RaceCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new race code</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.EthnicityTypeCode.touched || perForm.controls.EthnicityTypeCode.dirty) && perForm.controls.EthnicityTypeCode.errors?.required}"
+				placeholder="Ethnicity Type" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="EthnicityTypeCodeList" bindLabel="EthnicityTypeCode"
+				bindValue="id" formControlName="EthnicityTypeCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new ethnicity type</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.ReligionName.touched || perForm.controls.ReligionName.dirty) && perForm.controls.ReligionName.errors?.required}"
+				placeholder="Religion Name" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="ReligionNameList" bindLabel="ReligionName" bindValue="id"
+				formControlName="ReligionName">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new religion name</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.EducationLevelCode.touched || perForm.controls.EducationLevelCode.dirty) && perForm.controls.EducationLevelCode.errors?.required}"
+				placeholder="Education Level" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="EducationLevelCodeList" bindLabel="EducationLevelCode"
+				bindValue="id" formControlName="EducationLevelCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new education level</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.EmploymentStatusCode.touched || perForm.controls.EmploymentStatusCode.dirty) && perForm.controls.EmploymentStatusCode.errors?.required}"
+				placeholder="Employment Status" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="EmploymentStatusTypeList" bindLabel="EmploymentStatusCode"
+				bindValue="id" formControlName="EmploymentStatusCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new employment status</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.OccupationTypeCode.touched || perForm.controls.OccupationTypeCode.dirty) && perForm.controls.OccupationTypeCode.errors?.required}"
+				placeholder="Occupation Type" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="OccupationTypeCodeList" bindLabel="OccupationTypeCode"
+				bindValue="id" formControlName="OccupationTypeCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new occupation type</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.AnnualIncomeRangeCode.touched || perForm.controls.AnnualIncomeRangeCode.dirty) && perForm.controls.AnnualIncomeRangeCode.errors?.required}"
+				placeholder="Annual Income Range" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="AnnualIncomeRangeCodeList" bindLabel="AnnualIncomeRangeCode"
+				bindValue="id" formControlName="AnnualIncomeRangeCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new annual income range</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.PersonalityTypeCode.touched || perForm.controls.PersonalityTypeCode.dirty) && perForm.controls.PersonalityTypeCode.errors?.required}"
+				placeholder="Personality Type" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="PersonalityTypeCodeList" bindLabel="PersonalityTypeCode"
+				bindValue="id" formControlName="PersonalityTypeCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new personality type</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.LifestyleTypeCode.touched || perForm.controls.LifestyleTypeCode.dirty) && perForm.controls.LifestyleTypeCode.errors?.required}"
+				placeholder="Lifestyle Type" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="LifestyleTypeCodeList" bindLabel="LifestyleTypeCode"
+				bindValue="id" formControlName="LifestyleTypeCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new lifestyle type</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.PersonalValueTypeCode.touched || perForm.controls.PersonalValueTypeCode.dirty) && perForm.controls.PersonalValueTypeCode.errors?.required}"
+				placeholder="Personal Value Type" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="PersonalValueTypeCodeList" bindLabel="PersonalValueTypeCode"
+				bindValue="id" formControlName="PersonalValueTypeCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new personal value type</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Consumer Credit Score</mat-label>
+			<input matInput formControlName="ConsumerCreditScore">
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Consumer Credit Rating Service Name</mat-label>
+			<input matInput formControlName="ConsumerCreditRatingServiceName">
+		</mat-form-field>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.DisabilityImpairmentTypeCode.touched || perForm.controls.DisabilityImpairmentTypeCode.dirty) && perForm.controls.DisabilityImpairmentTypeCode.errors?.required}"
+				placeholder="Disability Impairment Type" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="DisabilityImpairmentTypeCodeList"
+				bindLabel="DisabilityImpairmentTypeCode" bindValue="id" formControlName="DisabilityImpairmentTypeCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new disability impairment type</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div class="ng-select-wrapper">
+			<ng-select
+				[ngClass]="{'ng-error':(perForm.controls.DietaryHabitTypeCode.touched || perForm.controls.DietaryHabitTypeCode.dirty) && perForm.controls.DietaryHabitTypeCode.errors?.required}"
+				placeholder="Dietary Habit Type" [addTag]="addTagCommon" [clearOnBackspace]="true"
+				[dropdownPosition]="'bottom'" [items]="DietaryHabitTypeCodeList" bindLabel="DietaryHabitTypeCode"
+				bindValue="id" formControlName="DietaryHabitTypeCode">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new disability habit type</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+	</div>
+</form>
+
+<div class="edit-view-heading">Contact Details <i class="icon-plus ml-auto" (click)="manageContactMethod()"></i></div>
+<div class="edit-view-body" *ngIf="showContactMethods.length">
+	<div class="row mb-2" *ngFor="let contactDetails of showContactMethods; let i = index;">
+		<div class="col">
+			<h6>{{contactDetails.label}}</h6>
+			<p>{{contactDetails.fullAddress}}</p>
+			<p><span class="text-muted">Phone:</span>{{contactDetails.phone}}</p>
+			<p><span class="text-muted">Email:</span>{{contactDetails.email}}</p>
+		</div>
+		<div class="col-auto">
+			<i class="icon-pencil mr-2" (click)="editContactMethod(i)"></i>
+			<i class="icon-close" (click)="deleteContactMethod(i)"></i>
+		</div>
+	</div>
+</div>
+
+<div class="edit-view-footer">
+	<button type="button" mat-button color="accent" cdkFocusInitial class="ml-auto"
+		(click)="onNoClick()">Cancel</button>
+	<button mat-flat-button color="accent" cdkFocusInitial *ngIf="!editData.length" [disabled]="isbtnLoaderShow"
+		(click)="doValidate()">{{btnCreateTxt}}</button>
+	<button mat-flat-button color="accent" cdkFocusInitial *ngIf="editData.length" [disabled]="isbtnLoaderShow"
+		(click)="doValidate()">{{btnUpdateTxt}}</button>
+</div>

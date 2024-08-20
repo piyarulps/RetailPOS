@@ -1,0 +1,109 @@
+<div class="pop-heading" mat-dialog-title>{{dialogTitle}}
+	<div class="d-inline-flex">
+		<button type="button" mat-icon-button (click)="_dialogRef.close(false)"><i class="icon-cursor"></i></button>
+	</div>
+</div>
+<div mat-dialog-content>
+	<div class="table-action">
+		<div class="row align-items-center">
+			<div class="col order-2 order-md-1 d-flex">
+				<button mat-stroked-button class="d-none d-lg-block" (click)="manageItem()"><i
+						class="icon-plus mr-2"></i> Add Item</button>
+				<button mat-stroked-button class="d-lg-none btn-box" (click)="manageItem()"><i
+						class="icon-plus"></i></button>
+			</div>
+			<div class="col-12 col-md-auto ml-auto order-1 order-md-2">
+				<div class="search-box">
+					<i class="icon-searching"></i>
+					<input type="text" placeholder="Search for Item" [(ngModel)]="searchText" (keyup)="search($event)">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div [hidden]="!isLoading" class="loader-bg">
+		<mat-spinner></mat-spinner>
+	</div>
+	<div class="table-list" [hidden]="isLoading">
+		<form [formGroup]="ItemCollectionForm" autocomplete="off" #ItemCollectionTabForm="ngForm">
+			<ng-container formArrayName="settingItemCollection">
+				<table *ngIf="ItemCollectionList.length" mat-table [dataSource]="settingItemCollection.controls" matSort
+					class="mat-elevation-z8">
+					<ng-container matColumnDef="select">
+						<th mat-header-cell *matHeaderCellDef>
+							<mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+								[checked]="selection.hasValue() && isAllSelected()"
+								[indeterminate]="selection.hasValue() && !isAllSelected()"
+								[aria-label]="checkboxLabel()">
+							</mat-checkbox>
+						</th>
+						<td mat-cell *matCellDef="let row" class="check-box">
+							<mat-checkbox color="primary" (click)="$event.stopPropagation()"
+								(change)="$event ? setSelect(row) : null" [checked]="selection.isSelected(row)"
+								[aria-label]="checkboxLabel(row)">
+							</mat-checkbox>
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="POSItemID">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Product #</th>
+						<td mat-cell *matCellDef="let element;let i = index;" data-label="Party_id">
+							{{ItemCollectionForm.controls.settingItemCollection.controls[i].controls.POSItemID.value}}
+						</td>
+					</ng-container>
+					<ng-container matColumnDef="Description">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Description</th>
+						<td mat-cell *matCellDef="let element;let i = index;" data-label="Party_id">
+							{{ItemCollectionForm.controls.settingItemCollection.controls[i].controls.Description.value}}
+						</td>
+					</ng-container>
+					<ng-container matColumnDef="BrandName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Brand</th>
+						<td mat-cell *matCellDef="let element;let i = index;" data-label="Legal Name">
+							<div>
+								{{ItemCollectionForm.controls.settingItemCollection.controls[i].controls.BrandName.value}}
+							</div>
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="TableName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> size</th>
+						<td mat-cell *matCellDef="let element;let i = index;" data-label="First Name">
+							{{ItemCollectionForm.controls.settingItemCollection.controls[i].controls.size.value}}</td>
+					</ng-container>
+
+
+					<ng-container matColumnDef="PerAssemblyCount">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header align="right">Qty in Mother</th>
+						<td mat-cell *matCellDef="let element" data-label="Cost" align="right" [formGroup]="element">
+							<mat-form-field appearance="outline">
+								<input (keyup)="!selection.isSelected(element) && $event ? setSelect(element): null"
+									matInput placeholder="Type Here" formControlName="PerAssemblyCount">
+							</mat-form-field>
+						</td>
+					</ng-container>
+
+					<tr mat-header-row *matHeaderRowDef="ItemCollectionDisplayedColumns; sticky: true"></tr>
+					<tr mat-row *matRowDef="let row; columns: ItemCollectionDisplayedColumns;let i=index;"
+						[ngClass]="{'active': selection.isSelected(row)}"></tr>
+				</table>
+				<!-- <div *ngIf="!ItemCollectionList.length && strMsg" class="no-data"> -->
+				<div *ngIf="!ItemCollectionList.length && !strMsg" class="no-data text-center">
+					<a href="javascript:void(0)" (click)="manageItem()">CLICK HERE</a> to add a item
+				</div>
+				<!-- <div *ngIf="!ItemCollectionList.length && !strMsg" class="no-data">
+					<span>No record(s) found.</span>
+				</div> -->
+			</ng-container>
+		</form>
+		<mat-paginator *ngIf="ItemCollectionList.length" [pageSizeOptions]="paginationSetup.pageLimitOptions"
+			[pageSize]="paginationSetup.pageLimit" [length]="paginationSetup.totalRecord" showFirstLastButtons>
+		</mat-paginator>
+	</div>
+</div>
+<div mat-dialog-actions class="pop-footer">
+	<button mat-stroked-button class="ml-auto" cdkFocusInitial (click)="_dialogRef.close(false)">Cancel</button>
+	<button mat-flat-button color="accent" cdkFocusInitial (click)="addItem()"
+		*ngIf="!editData.length">{{btnCreateTxt}}</button>
+	<button mat-flat-button color="accent" cdkFocusInitial (click)="addItem()"
+		*ngIf="editData.length">{{btnUpdateTxt}}</button>
+</div>

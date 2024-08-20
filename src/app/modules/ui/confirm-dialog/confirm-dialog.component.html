@@ -1,0 +1,22 @@
+<!-- <h3 class="pop-heading">Confirm <a href="javascript:void(0)" class="pop-close"><i class="icon-close"
+      (click)="onNoClick()"></i></a></h3>
+<div class="pop-body">
+  {{dialogData.message}}
+</div>
+<div class="pop-footer">
+  <button mat-flat-button color="primary" (click)="onYesClick()">Yes</button>
+  <button color="primary" mat-button (click)="onNoClick()">No</button>
+</div> -->
+
+<div class="pop-heading" mat-dialog-title>Confirm
+	<div class="d-inline-flex">
+		<button mat-icon-button (click)="onNoClick()"><i class="icon-cursor"></i></button>
+	</div>
+</div>
+<div mat-dialog-content [innerHtml]="dialogData.message">
+	<!-- {{dialogData.message}} -->
+</div>
+<div mat-dialog-actions class="pop-footer">
+	<button mat-flat-button color="accent" class="" (click)="onYesClick()">Yes</button>
+	<button mat-button color="accent" (click)="onNoClick()">No</button>
+</div>

@@ -1,0 +1,150 @@
+<form [formGroup]="myForm" (ngSubmit)="doManage()">
+  <div class="edit-view-heading">
+    <i class="icon-copy"></i>
+    {{dialogTitle}}
+    <!-- <button mat-icon-button (click)="onNoClick()" type="button" class="ml-auto"><i class="icon-cursor"></i></button> -->
+  </div>
+  <div class="edit-view-body">
+    <div [hidden]="editData.length > 1">
+      <div [hidden]="editData.length && editData.length > 1">
+        <mat-form-field appearance="outline">
+          <mat-label>Name*</mat-label>
+          <input matInput formControlName="name">
+          <mat-error *ngIf="(f.name.touched || f.name.dirty || submitted)">
+            <span *ngIf="f.name.errors?.required">Name is required.</span>
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <mat-form-field appearance="outline">
+        <mat-label>Type Code</mat-label>
+        <mat-select formControlName="typeCode" [disabled]="checkTypeCode" (ngModelChange)="onTypeCodechange($event)">
+          <mat-option *ngFor="let data of typeCode" [value]="data.id">
+            {{data.text}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+
+
+
+
+
+    <div [hidden]="showTypeCodeRelatedField">
+      <mat-form-field appearance="outline">
+        <mat-label>Open Date</mat-label>
+        <input matInput placeholder="MM/DD/YYYY" [min]="minDate" autocomplete="off" formControlName="openDate"
+          [matDatepicker]="picker_open_date" (focus)="_openCalendar(picker_open_date)"
+          (click)="_openCalendar(picker_open_date)">
+        <mat-datepicker #picker_open_date></mat-datepicker>
+        <!-- <mat-error *ngIf="f.begin_date.errors?.isInvalid">
+          <span>Begin date should be less than end date.</span>
+        </mat-error> -->
+      </mat-form-field>
+    </div>
+    <div [hidden]="showTypeCodeRelatedField">
+      <mat-form-field appearance="outline">
+        <mat-label>Close Date</mat-label>
+        <input matInput placeholder="MM/DD/YYYY" [min]="f.openDate.value" autocomplete="off" formControlName="closeDate"
+          [matDatepicker]="picker_close_date" (focus)="_openCalendar(picker_close_date)"
+          (click)="_openCalendar(picker_close_date)">
+        <mat-datepicker #picker_close_date></mat-datepicker>
+      </mat-form-field>
+    </div>
+    <div [hidden]="showTypeCodeRelatedField">
+      <mat-form-field appearance="outline">
+        <mat-label>Size</mat-label>
+        <input matInput formControlName="size">
+        <mat-error *ngIf="(f.size.touched || f.size.dirty || submitted)">
+          <span *ngIf="f.size.errors">Enter valid Size .</span>
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div [hidden]="showTypeCodeRelatedField">
+      <mat-form-field appearance="outline">
+        <mat-label>Selling Area Size</mat-label>
+        <input matInput formControlName="sellingAreaSize">
+        <mat-error *ngIf="(f.sellingAreaSize.touched || f.sellingAreaSize.dirty || submitted)">
+          <span *ngIf="f.sellingAreaSize.errors">Enter valid Selling Area Size .</span>
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div [hidden]="showTypeCodeRelatedField">
+      <mat-form-field appearance="outline">
+        <mat-label>Last Remodal Date</mat-label>
+        <input matInput placeholder="MM/DD/YYYY" autocomplete="off" formControlName="lastremodeldate"
+          [matDatepicker]="picker_lastremodeldate" (focus)="_openCalendar(picker_lastremodeldate)"
+          (click)="_openCalendar(picker_lastremodeldate)">
+        <mat-datepicker #picker_lastremodeldate></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Local Currency</mat-label>
+      <mat-select formControlName="localcurrency">
+        <mat-option value="">
+          None
+        </mat-option>
+        <mat-option *ngFor="let data of localCurrency" [value]="data.id">
+          {{data.text}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>ISO Currency</mat-label>
+      <mat-select formControlName="isoCurrency">
+        <mat-option value="">
+          None
+        </mat-option>
+        <mat-option *ngFor="let ISOCurrency of ISOCurrency" [value]="ISOCurrency.id">
+          {{ISOCurrency.text}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option value="n">Active</mat-option>
+        <mat-option value="y">Deactive</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <ng-select placeholder="Operation Party" [dropdownPosition]="'bottom'" [addTag]="true" [items]="operatingParty"
+      bindLabel="text" bindValue="id" (clear)="clear()" appendTo="body" (change)="onOperationPartyChange($event)"
+      formControlName="operationParty">
+      <ng-template ng-tag-tmp let-search="searchTerm">
+        <b [ngStyle]="{'color': '#0000FF'}">Add new Operation Party</b>: {{search}}
+      </ng-template>
+    </ng-select>
+
+    <ng-select placeholder="Business Group" [dropdownPosition]="'bottom'" [addTag]="true" [items]="businessGroup"
+      bindLabel="text" bindValue="id" (clear)="clear()" appendTo="body" (change)="onBusinessGroupChange($event)"
+      formControlName="businessGroup">
+      <ng-template ng-tag-tmp let-search="searchTerm">
+        <b [ngStyle]="{'color': '#0000FF'}">Add new Business Group</b>: {{search}}
+      </ng-template>
+    </ng-select>
+
+    <div [hidden]="editData.length && editData.length > 1">
+      <ng-select placeholder="Business Site" [dropdownPosition]="'bottom'" [addTag]="false" appendTo="body"
+        [items]="businessSite" bindLabel="text" bindValue="id" [multiple]="true" formControlName="businessSite">
+        <ng-template ng-tag-tmp let-search="searchTerm">
+          <b [ngStyle]="{'color': '#0000FF'}">Add new Business Site</b>: {{search}}
+        </ng-template>
+      </ng-select>
+    </div>
+
+
+
+  </div>
+  <div class="edit-view-footer">
+    <button type="button" mat-button color="accent" cdkFocusInitial class="ml-auto"
+      (click)="onNoClick()">Cancel</button>
+    <button mat-flat-button color="accent" cdkFocusInitial *ngIf="!editData.length"
+      [disabled]="isbtnLoaderShow">{{btnCreateTxt}}</button>
+    <button mat-flat-button color="accent" cdkFocusInitial *ngIf="editData.length"
+      [disabled]="isbtnLoaderShow">{{btnUpdateTxt}}</button>
+  </div>
+</form>

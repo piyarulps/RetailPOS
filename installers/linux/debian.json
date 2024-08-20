@@ -1,0 +1,11 @@
+{
+    "dest": "release-builds/linux-installer/",
+    "icon": "dist/assets/icons/favicon.png.ico",
+    "categories": [
+        "Utility"
+    ],
+    "lintianOverrides": [
+        "changelog-file-missing-in-native-package"
+    ],
+    "productDescription": "RPOS-App"
+}

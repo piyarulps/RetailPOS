@@ -1,0 +1,39 @@
+
+
+
+<div class="pop-heading" mat-dialog-title>{{dialogTitle}}
+  <div class="d-inline-flex">
+    <button mat-icon-button  (click)="_dialogRef.close()"><i class="icon-cursor"></i></button>
+  </div>
+</div>
+<form [formGroup]="addModuleForm" (ngSubmit)="onSubmit()">
+  <div mat-dialog-content>
+    <div class="box">
+      <div class="row">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline">
+            <mat-label>Site Type name*</mat-label>
+            <input matInput formControlName="siteTypeName">
+            <mat-error *ngIf="(f.siteTypeName.touched || f.siteTypeName.dirty || submitted)">
+              <span *ngIf="f.siteTypeName.errors?.required">Operation Part name is required.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline">
+            <mat-label>Descripition</mat-label>
+            <input matInput formControlName="descripition">
+            <mat-error *ngIf="(f.descripition.touched || f.descripition.dirty || submitted)">
+              <span *ngIf="f.descripition.errors?.required">Descripition is invalid.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div mat-dialog-actions class="pop-footer">
+      <button mat-flat-button color="accent"  cdkFocusInitial  type="submit"
+      [ngClass]="{'btn-loader': isLoading}">{{btnValue}}<i [hidden]="isLoading"></i></button>
+    <button  mat-stroked-button  class="ml-auto" cdkFocusInitial (click)="backProgress()">Cancel</button>
+  </div>
+</form>

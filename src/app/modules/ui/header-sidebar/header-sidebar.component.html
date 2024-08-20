@@ -1,0 +1,190 @@
+<header>
+	<div class="row align-items-center">
+		<div class="col-auto">
+			<button mat-button (click)="toggleSidebar()" color="white" class="btn-box">
+				<i class="icon-menu"></i>
+			</button>
+		</div>
+		<div class="col-auto">
+			<div class="page-heading">{{pageData.displayModuleName}}</div>
+		</div>
+		<div class="col-12 col-md-auto ml-auto order-2 order-md-1">
+			<div class="search-box">
+				<i class="icon-searching"></i>
+				<input type="text" placeholder="Search for {{pageData.displayModuleName}}" [(ngModel)]="searchText"
+					(keyup)="changeSearchText()" (focus)="searchBoxFocused = true" (blur)="searchBoxFocused = false"
+					#searchBox>
+			</div>
+		</div>
+		<div class="col-12 col-md-auto order-1 order-md-2">
+			<div class="top-btn">
+				<button [hidden]="isRefreshLoading || !refreshableModules.includes(pageData.moduleName)"
+					(click)="refresh()" mat-stroked-button color="white" class="btn-box "><i
+						class="icon-synchronization"></i> </button>
+				<button [hidden]="!isRefreshLoading" mat-stroked-button color="white"><i
+						class="icon-synchronization rotet"></i>
+					Refreshing</button>
+				<button (click)="showSync()" mat-stroked-button color="white" class="btn-box "><i
+						class="icon-download"></i>
+				</button>
+				<button mat-icon-button class="d-md-none">
+					<i class="icon-searching"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+</header>
+<!-- <nav [ngClass]="{'active': isShowSideNav}" id="navSidebar">
+		  <div class="user-section">
+			  <div class="user-pic">
+				  <span>{{userNameFirstLetter}}</span>
+			  </div>
+			  <div class="user-name">{{userName}}</div>
+		  </div>
+		  <div class="nav-section">
+			  <div *ngFor="let menu of headerMenu;" [ngClass]="{'active': menu.isSelected}" (click)="goToMenu(menu)"
+				  class="nav-item" matRipple>
+				  <i class="{{menu.icon}}"></i>
+				  {{menu.title}}
+				  <i *ngIf="menu.subMenu" class="icon-right-arrow ml-auto"></i>
+			  </div>
+			  <div class="nav-item" (click)="logout()" matRipple><i class="icon-power"></i> Logout</div>
+		  </div>
+		  <div class="nav-sub-suction" [ngClass]="{'active':  isShowSubMenu}">
+			  <div class="user-section">
+				  <div class="user-name"><i class="icon-left-arrow" (click)="hideSideMenu()"></i>
+					  {{headerSubMenu.title}}</div>
+			  </div>
+			  <div class="nav-section">
+				  <div *ngFor="let subMenu of headerSubMenu.subMenu;" [ngClass]="{'active': subMenu.isSelected}"
+					  [routerLink]="[subMenu.link]" matRipple class="nav-item">{{subMenu.title}}</div>
+			  </div>
+		  </div>
+	  </nav> -->
+<nav [ngClass]="{'active': isShowSideNav}" id="navSidebar">
+	<div class="user-section">
+		<div class="user-pic">
+			<span>{{userNameFirstLetter}}</span>
+		</div>
+		<div class="user-name">{{userName}}</div>
+	</div>
+	<div class="nav-section">
+		<mat-accordion>
+			<div class="nav-item" [routerLink]="['/dashboard']" matRipple><i class="icon-home"></i> Back to POS</div>
+			<mat-expansion-panel *ngFor="let menu of headerMenu;let i=index" [expanded]="isShowSubMenu == menu.title">
+				<mat-expansion-panel-header>
+					<i class="{{menu.icon}}"></i>{{menu.title}}
+				</mat-expansion-panel-header>
+				<ng-container *ngFor="let subMenu of menu.subMenu;" (click)="hideSideMenu(menu.title)">
+					<div matRipple class="suv-nav-item" [ngClass]="{'active': subMenu.isSelected}"
+						[routerLink]="[subMenu.link]" matRipple>{{subMenu.title}}</div>
+				</ng-container>
+			</mat-expansion-panel>
+			<div class="nav-item" (click)="logout()" matRipple><i class="icon-power"></i> Logout</div>
+		</mat-accordion>
+	</div>
+</nav>
+<div class="nav-bg" (click)="isShowSideNav = false; isShowBackground = false;"></div>
+<div class="column-box" [ngClass]="{'active':  userPreSetColumns}">
+	<div class="col-heading">
+		Modify Columns
+		<button mat-icon-button (click)="DbColumnsets()">
+			<i class="icon-add"></i>
+		</button>
+	</div>
+	<div class="col-section" *ngIf="ColumnSetList.length">
+		<div class="col-item" *ngFor="let ColumnSet of ColumnSetList; let i = index;"
+			[ngClass]="{'active': ColumnSet.isSelected}">
+			<span (click)="DisplayPreSetCoulmns(ColumnSetList[i])">{{ColumnSet.ColumnSetName}}</span>
+			<i class="icon-pencil" (click)="editColumnSet(ColumnSetList[i])"></i>
+			<i class="icon-rubbish-bin" (click)="deleteColumnSet(moduleName, UserId, ColumnSetList[i])"></i>
+		</div>
+	</div>
+</div>
+<div class="column-box sub" [ngClass]="{'active':  isAddColClass}">
+	<div class="col-heading ">
+		<button mat-icon-button (click)=" isAddColClass = false;">
+			<i class="icon-left-arrow"></i>
+		</button>
+		Add Modify Columns
+	</div>
+	<div class="col-section" *ngIf="ColumnList && ColumnList.length" cdkDropList #ColumnListList="cdkDropList"
+		(cdkDropListDropped)="columnDargDrop($event)">
+		<div class="col-item" *ngFor="let Column of ColumnList; let i = index;" [hidden]="i == 0 || !Column.isUsed"
+			cdkDrag [cdkDragData]="Column">
+			<span>{{Column.name}} </span>
+			<mat-checkbox (change)="$event ? changeColumnSet($event, Column.name, i) : null"
+				[checked]="Column.isDisplayed" [disabled]="!Column.isEditable"></mat-checkbox>
+		</div>
+	</div>
+	<div class="col-action">
+		<mat-checkbox (change)="saveCheckValue($event)" [checked]="isColumnSaveChecked">Save Column Set</mat-checkbox>
+		<button mat-flat-button color="accent" (click)="manageModifyColumnSet()">Apply</button>
+	</div>
+</div>
+<div class="col-bg" (click)="isColListClass = false; isAddColClass = false; userPreSetColumns = false;"></div>
+<div class="synchronize-bg" [hidden]="!isSyncing">
+	<div class="synchronize">
+		<div class="synchronize-heading">
+			Synchronize Data
+			<button [hidden]="isSyncLoading" mat-icon-button cdkFocusInitial class="ml-auto" (click)="cancelSync()">
+				<i class="icon-cursor"></i>
+			</button>
+		</div>
+		<div class="synchronize-body" [hidden]="syncStepperConfig.currentStep != syncStepperConfig.initStep">
+			<p>Choose component to download:</p>
+			<mat-radio-group [(ngModel)]="syncType" [ngModelOptions]="{standalone: true}" aria-label="Select an option"
+				color="accent" class="radio-group">
+				<mat-radio-button value="1" [checked]="syncType == '1'">All Components</mat-radio-button>
+				<mat-radio-button value="2" [checked]="syncType == '2'">Items</mat-radio-button>
+				<mat-radio-button value="3" [checked]="syncType == '3'" disabled>Transactions</mat-radio-button>
+			</mat-radio-group>
+		</div>
+		<div class="synchronize-body" [hidden]="syncStepperConfig.currentStep != 2">
+			<p>Choose component to download:</p>
+			<ul class="synchronize-list">
+				<li *ngFor="let modules of syncModuleList; let i = index;">
+					<mat-checkbox (change)="$event ? syncSelect($event, i) : null" [checked]="modules.isSelected">
+						{{modules.DisplayModuleName}}</mat-checkbox>
+				</li>
+			</ul>
+		</div>
+		<div class="synchronize-body" [hidden]="syncStepperConfig.currentStep != 3">
+			<div class="table-list">
+				<table mat-table [dataSource]="syncDataSource" class="mat-elevation-z8">
+					<ng-container matColumnDef="module">
+						<th mat-header-cell *matHeaderCellDef> Components </th>
+						<td mat-cell *matCellDef="let element" data-label="Module">
+							{{element.DisplayModuleName}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="sync_status">
+						<th mat-header-cell *matHeaderCellDef> Data Downloaded </th>
+						<td mat-cell *matCellDef="let element" data-label="Data Downloaded">
+							{{element.DataCount ? element.DataCount : 0}}
+						</td>
+					</ng-container>
+
+					<tr mat-header-row *matHeaderRowDef="syncDisplayedColumns"></tr>
+					<tr mat-row *matRowDef="let row; columns: syncDisplayedColumns;"></tr>
+				</table>
+			</div>
+			<div class="synchronize-bar">
+				<div class="syn-text">{{syncPercent | number: '1.2-2'}}%</div>
+				<div class="syn-bar" [ngStyle]="{'width.%': syncPercent}">
+					<div class="syn-text">{{syncPercent | number: '1.2-2'}}%</div>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="synchronize-footer">
+			<button mat-stroked-button cdkFocusInitial (click)="syncStepperNavigate('back')"
+				[hidden]="syncStepperConfig.currentStep == syncStepperConfig.initStep || syncStepperConfig.currentStep == syncStepperConfig.maxStep">Back</button>
+			<!-- <button mat-stroked-button cdkFocusInitial class="ml-auto"
+					  (click)="cancelSync()">{{syncStepperConfig.cancelBtnText}}</button> -->
+			<button mat-flat-button color="accent" cdkFocusInitial (click)="syncStepperNavigate('next')"
+				[disabled]="isSyncLoading" class="ml-auto">{{syncStepperConfig.doneBtnText}}</button>
+		</div>
+	</div>
+</div>

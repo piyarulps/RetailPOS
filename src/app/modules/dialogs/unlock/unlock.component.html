@@ -1,0 +1,28 @@
+<form [formGroup]="myForm" (ngSubmit)="doManage()">
+	<div class="pop-heading" mat-dialog-title>{{dialogTitle}}
+		<div class="d-inline-flex">
+			<button type="button" mat-icon-button (click)="_dialogRef.close(false)"><i class="icon-cursor"></i></button>
+		</div>
+	</div>
+	<div mat-dialog-content>
+		<div class="row">
+			<div class="col-md-12">
+				<mat-form-field appearance="outline">
+					<mat-label>Password</mat-label>
+					<input matInput formControlName="password" (keydown)="validateNumber($event)" type="password"
+						maxlength="15" #passwordInput>
+					<mat-error *ngIf="(f.password.touched || f.password.dirty || submitted)">
+						<span *ngIf="f.password.errors?.required">Enter password to continue.</span>
+						<span *ngIf="f.password.errors?.minlength">Password length should be within 4 to 15
+							digits.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+		</div>
+	</div>
+	<div mat-dialog-actions class="pop-footer">
+		<button mat-stroked-button class="ml-auto" cdkFocusInitial (click)="_dialogRef.close(false)"
+			type="button">Cancel</button>
+		<button mat-flat-button color="accent" cdkFocusInitial (disabled)="isDisabled">{{btnCreateTxt}}</button>
+	</div>
+</form>

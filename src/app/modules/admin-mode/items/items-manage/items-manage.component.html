@@ -1,0 +1,507 @@
+<div class="edit-view-staper">
+	<ul class="arrow-staper">
+		<li [ngClass]="{'active': stepperConfig.currentStep == 1, 'done': stepperConfig.currentStep > 1,'hover': stepperConfig.currentStep != 1 && ItemID !=''}"
+			(click)="getTabWiseDetails(1)"><i class="icon-info-sign"></i></li>
+		<li [ngClass]="{'active': stepperConfig.currentStep == 4, 'done': stepperConfig.currentStep > 4,'hover': stepperConfig.currentStep != 4 && ItemID !=''}"
+			(click)="getTabWiseDetails(4)"><i class="icon-box"></i></li>
+		<li [ngClass]="{'active': stepperConfig.currentStep == 5, 'done': stepperConfig.currentStep > 5,'hover': stepperConfig.currentStep != 5 && ItemID !=''}"
+			(click)="getTabWiseDetails(5)"><i class="icon-shelves"></i></li>
+	</ul>
+</div>
+<div class="staper-container" [ngClass]="{'d-none': stepperConfig.currentStep != 1}">
+	<form [formGroup]="addModuleForm" #basicInfoForm="ngForm">
+		<div class="edit-view-heading">
+			Item's Basic Details
+		</div>
+		<div class="edit-view-body">
+			<div class="ng-select-wrapper" [hidden]="editIds.length && editIds.length > 1">
+				<ng-select
+					[ngClass]="{'ng-error':(f.upc.touched || f.upc.dirty || submitted) && f.upc.errors?.required }"
+					placeholder="Select Product# *" [addTag]="addTag" [clearOnBackspace]="true"
+					[dropdownPosition]="'bottom'" [items]="ProductDropDownList" bindLabel="_source.UPC_A"
+					bindValue="_source.UPC_A" [loading]="ProductnameLoading" formControlName="upc"
+					(change)="onSelectProduct($event)" (keyup)="onProductNameSearch($event)" [multiple]="true"
+					[(ngModel)]="seletedproductList" color="primary" appendTo="body">
+					<ng-template ng-label-tmp let-item="item" let-clear="clear">
+						<span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true">×</span>
+						<span>{{ item._source.UPC_A }}</span>
+					</ng-template>
+					<ng-template ng-option-tmp let-item="item" let-search="searchTerm" let-index="index"
+						let-clear="clear">
+						<span *ngIf="item._source.POS_Name!='' && item._source.POS_Name!=null;else withOutDesc">
+							{{ item._source.UPC_A + '(' + item._source.POS_Name+')'}}
+						</span>
+						<ng-template #withOutDesc>
+							<span>{{ item._source.UPC_A }}</span>
+						</ng-template>
+					</ng-template>
+					<ng-template ng-tag-tmp let-search="searchTerm">
+						<b [ngStyle]="{'color': '#0000FF'}">Add new product</b>: {{search}}
+					</ng-template>
+				</ng-select>
+				<mat-error *ngIf="(f.upc.touched || f.upc.dirty || submitted)">
+					<span *ngIf="f.upc.errors?.required">Select value for Product# .</span>
+				</mat-error>
+			</div>
+			<div class="ng-select-wrapper" [hidden]="editIds.length && editIds.length > 1">
+				<ng-container *ngIf="isSelectBox;else textBox;">
+					<ng-select
+						[ngClass]="{'ng-error':(f.description.touched || f.description.dirty || submitted) && f.description.errors?.required}"
+						placeholder="Select Description *" [addTag]="addTagDescription" [clearOnBackspace]="true"
+						[dropdownPosition]="'bottom'" [items]="ProductDropDownDescription" bindLabel="_source.POS_Name"
+						bindValue="_source.POS_Name" [loading]="ProductdescriptionLoading" formControlName="description"
+						(change)="onSelectProductDescription($event)" (keyup)="onProductNameDescriptionSearch($event)"
+						[multiple]="false" [(ngModel)]="selectedProductDescription" appendTo="body">
+						<ng-template ng-tag-tmp let-search="searchTerm">
+							<b [ngStyle]="{'color': '#0000FF'}">Add new description</b>: {{search}}
+						</ng-template>
+					</ng-select>
+					<mat-error *ngIf="(f.description.touched || f.description.dirty || submitted)">
+						<span *ngIf="f.description.errors?.required">Select value for
+							description.</span>
+					</mat-error>
+				</ng-container>
+				<ng-template #textBox>
+					<mat-form-field appearance="outline">
+						<mat-label>Description</mat-label>
+						<input matInput placeholder="Description" formControlName="description">
+						<mat-error *ngIf="(f.description.touched || f.description.dirty || submitted)">
+							<span *ngIf="f.description.errors?.required">Select value for
+								description.
+							</span>
+						</mat-error>
+					</mat-form-field>
+				</ng-template>
+			</div>
+			<div class="ng-select-wrapper">
+				<ng-select placeholder="Select POS Department" [dropdownPosition]="'bottom'" [addTag]="true"
+					[items]="POSDepartmentList" bindLabel="text" bindValue="text"
+					(change)="onSelectPOSDepartment($event)" formControlName="pos_department_name"
+					(clear)="clear('pos')" color="primary">
+					<ng-template ng-tag-tmp let-search="searchTerm">
+						<b [ngStyle]="{'color': '#0000FF'}">Add new POS Department</b>:
+						{{search}}
+					</ng-template>
+				</ng-select>
+			</div>
+			<div class="ng-select-wrapper">
+				<ng-select placeholder="Select Brand" [dropdownPosition]="'bottom'" [addTag]="true" [items]="BrandList"
+					bindLabel="text" bindValue="text" (change)="onSelectBrandName($event)" formControlName="brand_name"
+					(clear)="clear('brand')" color="primary">
+					<ng-template ng-tag-tmp let-search="searchTerm">
+						<b [ngStyle]="{'color': '#0000FF'}">Add new Brand</b>: {{search}}
+					</ng-template>
+				</ng-select>
+			</div>
+			<div class="ng-select-wrapper">
+				<ng-select placeholder="Select Sub Brand" [dropdownPosition]="'bottom'" [addTag]="true"
+					[items]="SubBrandList" bindLabel="text" bindValue="text" (change)="onSelectSubBrandName($event)"
+					(clear)="clear('subbrand')" formControlName="sub_brand" color="primary">
+					<ng-template ng-tag-tmp let-search="searchTerm">
+						<b [ngStyle]="{'color': '#0000FF'}">Add new Sub Brand</b>: {{search}}
+					</ng-template>
+				</ng-select>
+			</div>
+			<div class="ng-select-wrapper">
+				<ng-select placeholder="Select Size" [dropdownPosition]="'bottom'" [addTag]="true" [items]="SizeList"
+					bindLabel="text" bindValue="text" (change)="onSelectSizeName($event)" (clear)="clear('size')"
+					formControlName="size" color="primary">
+					<ng-template ng-tag-tmp let-search="searchTerm">
+						<b [ngStyle]="{'color': '#0000FF'}">Add new Size</b>: {{search}}
+					</ng-template>
+				</ng-select>
+			</div>
+			<div class="ng-select-wrapper">
+				<ng-select placeholder="Select Retail Package Size" [dropdownPosition]="'bottom'" [addTag]="true"
+					[items]="RetailPackageSizeList" bindLabel="text" bindValue="id" (clear)="clear('RPS')"
+					formControlName="retail_package_size" (change)="onSelectRetailsPackageSize($event)" color="primary">
+					<ng-template ng-tag-tmp let-search="searchTerm">
+						<b [ngStyle]="{'color': '#0000FF'}">Add new Retail Package Size</b>:
+						{{search}}
+					</ng-template>
+				</ng-select>
+			</div>
+		</div>
+
+		<div class="edit-view-heading">Item Images
+			<div class="input-file  ml-auto">
+				<i class="icon-plus"></i>
+				<input type='file' (change)="onSelectFile($event)" multiple>
+			</div>
+		</div>
+		<div class="edit-view-body">
+			<ul class="img-box">
+				<!-- <img [src]="/home/nav87/irsfrontend/src/app/server/api/Items/item-images/iYKk8bWB75YQsU8O/image_2.jpeg"
+						height="200"> -->
+				<li *ngFor='let imageName of ImageNameFromServer;let i=index;'>
+					<img [src]="imageName" height="200">
+					<div class="img-close" (click)="removeImage(i, imageName)">
+						<i class="icon-close"></i>
+					</div>
+				</li>
+				<li *ngFor="let url of ImageBase64urls;let i=index;">
+					<img [src]="url" height="200">
+					<div class="img-close" (click)="removeImage(i)">
+						<i class="icon-close"></i>
+					</div>
+				</li>
+			</ul>
+		</div>
+
+		<div class="edit-view-heading">Inventory</div>
+		<div class="edit-view-body">
+			<div class="row">
+				<div class="col">
+					<p>{{showInventoryData}}</p>
+				</div>
+				<div class="col-auto">
+					<i class="icon-pencil" (click)="manageInventory()"></i>
+				</div>
+			</div>
+		</div>
+
+		<div class="edit-view-heading">Pricing</div>
+		<div class="edit-view-body">
+			<div class="row">
+				<div class="col">
+					<p>{{showPricingData}}</p>
+				</div>
+				<div class="col-auto">
+					<i class="icon-pencil" (click)="managePricing()"></i>
+				</div>
+			</div>
+		</div>
+
+		<div class="edit-view-heading">Merchandising</div>
+		<div class="edit-view-body">
+			<div class="row">
+				<div class="col">
+					<p>
+						{{showMerchandisingData}}
+					</p>
+				</div>
+				<div class="col-auto">
+					<i class="icon-pencil" (click)="manageMerchandising()"></i>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="staper-container" [ngClass]="{'d-none': stepperConfig.currentStep != 4}">
+	<div class="edit-view-heading">Supplier</div>
+	<div class="edit-view-body">
+		<div class="row">
+			<div class="col">
+				<p>{{showSupplierData}}</p>
+			</div>
+			<div class="col-auto">
+				<i class="icon-pencil" (click)="manageSupplier()"></i>
+			</div>
+		</div>
+	</div>
+	<div class="edit-view-heading">Item Collection</div>
+	<div class="edit-view-body">
+		<div class="row">
+			<div class="col">
+				<p>{{showItemCollectionData}}</p>
+			</div>
+			<div class="col-auto">
+				<i class="icon-pencil" (click)="manageItemCollection()"></i>
+			</div>
+		</div>
+	</div>
+	<div class="edit-view-heading">Advanced Details</div>
+	<div class="edit-view-body">
+		<form [formGroup]="AdvanceDetailsForm" #advanceDetailsInfoForm="ngForm">
+
+			<mat-form-field appearance="outline" *ngIf="MainItemTypeCode!='AGI'">
+				<mat-label>Item Type</mat-label>
+				<mat-select formControlName="TypeCode" (selectionChange)="getItemTypeOnchange($event)">
+					<mat-option *ngFor="let ItemType of ItemTypeList" [value]="ItemType.id">
+						{{ItemType.text}}
+					</mat-option>
+				</mat-select>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Long Description</mat-label>
+				<input matInput placeholder="Long Description" formControlName="LongDescription">
+			</mat-form-field>
+
+			<div class="ng-select-wrapper">
+				<ng-select placeholder="Price Line" [dropdownPosition]="'bottom'" [addTag]="true"
+					[items]="PriceLineList" bindLabel="text" bindValue="id" (change)="onSelectPriceline($event)"
+					formControlName="PriceLine_id" appendTo="body">
+					<ng-template ng-tag-tmp let-search="searchTerm">
+						<b [ngStyle]="{'color': '#0000FF'}">Add new priceline</b>: {{search}}
+					</ng-template>
+				</ng-select>
+			</div>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Tax Exempt Code</mat-label>
+				<mat-select formControlName="TaxExemptCode">
+					<mat-option *ngFor="let code of Tax_Exempt_Code" [value]="code.shortcode">
+						{{code.displayname}}
+					</mat-option>
+				</mat-select>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Useage Code</mat-label>
+				<mat-select formControlName="UsageCode">
+					<mat-option *ngFor="let code of Useage_Code" [value]="code.shortcode">
+						{{code.displayname}}
+					</mat-option>
+				</mat-select>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Kit Set Code</mat-label>
+				<mat-select formControlName="KitSetCode">
+					<mat-option *ngFor="let code of Kit_Set_Code" [value]="code.shortcode">
+						{{code.displayname}}
+					</mat-option>
+				</mat-select>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Order Collection Code</mat-label>
+				<mat-select formControlName="OrderCollectionCode">
+					<mat-option *ngFor="let code of Order_Collection_Code" [value]="code.shortcode">
+						{{code.displayname}}
+					</mat-option>
+				</mat-select>
+			</mat-form-field>
+
+			<div class="ng-select-wrapper" *ngIf="MainItemTypeCode!='AGI'">
+				<ng-select placeholder="Select counting" [dropdownPosition]="'bottom'" [addTag]="true"
+					[items]="RetailPackageSizeList" bindLabel="text" bindValue="id" (clear)="clear('RPS')"
+					formControlName="counting" appendTo="body">
+				</ng-select>
+			</div>
+
+			<mat-form-field appearance="outline" *ngIf="MainItemTypeCode!='AGI'">
+				<mat-label>Sale Weight or Unit Count</mat-label>
+				<input matInput placeholder="Sale Weight or Unit Count" formControlName="sale_weight_or_unit_count_code"
+					maxlength="2">
+			</mat-form-field>
+
+			<mat-form-field appearance="outline" *ngIf="MainItemTypeCode!='AGI'">
+				<mat-label>Unit Price Factor</mat-label>
+				<input matInput placeholder="Unit Price Factor" formControlName="unit_price_factor">
+				<mat-error *ngIf="AdvanceDetailsform.unit_price_factor.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline" *ngIf="MainItemTypeCode!='AGI'">
+				<mat-label>Available for Sale Date</mat-label>
+				<input matInput placeholder="Available for Sale Date" [matDatepicker]="available_sale_date"
+					(focus)="_openCalendar(available_sale_date)" (click)="_openCalendar(available_sale_date)"
+					[min]="isDateValidattionRequired ? currentDate :null" formControlName="available_for_sale_date">
+				<mat-datepicker #available_sale_date></mat-datepicker>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline" *ngIf="ItemTypeCode=='BI'">
+				<mat-label>Bulk To Selling Unit Waste Factor Percent</mat-label>
+				<input matInput placeholder="Bulk To Selling Unit Waste Factor Percent"
+					formControlName="bulk_to_selling_unit_waste_factor_percent">
+				<mat-error *ngIf="AdvanceDetailsform.bulk_to_selling_unit_waste_factor_percent.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline" *ngIf="ItemTypeCode=='BI'">
+				<mat-label>Bulk To Selling Unit Waste Type Code</mat-label>
+				<input matInput placeholder="Bulk To Selling Unit Waste Type Code"
+					formControlName="bulk_to_selling_unit_waste_type_code" maxlength="2">
+			</mat-form-field>
+
+			<mat-form-field appearance="outline" *ngIf="MainItemTypeCode!='AGI'">
+				<mat-label>Flags</mat-label>
+				<input matInput placeholder="Flags" formControlName="flag">
+			</mat-form-field>
+
+			<mat-form-field appearance="outline" *ngIf="MainItemTypeCode!='AGI'">
+				<mat-label>ABV</mat-label>
+				<input matInput placeholder="ABV" formControlName="abv">
+			</mat-form-field>
+
+		</form>
+	</div>
+</div>
+
+<div class="staper-container" [ngClass]="{'d-none': stepperConfig.currentStep != 5}">
+	<div class="edit-view-heading">Shelf Details</div>
+	<div class="edit-view-body">
+		<form [formGroup]="ShelfDetailsForm" #ShelfDetailsFeildForm="ngForm">
+			<mat-form-field appearance="outline">
+				<mat-label>Facing Count</mat-label>
+				<input matInput placeholder="Facing Count" formControlName="facings_count">
+				<mat-error *ngIf="shelfDetailsform.facings_count.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Staple Perishable Type</mat-label>
+				<input matInput placeholder="Staple Perishable Type" formControlName="staple_perishable_type_code"
+					maxlength="2">
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Shelf Life Day Count</mat-label>
+				<input matInput placeholder="Shelf Life Day Count" formControlName="shelf_life_day_count">
+				<mat-error *ngIf="shelfDetailsform.shelf_life_day_count.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Consumer Package Depth</mat-label>
+				<input matInput placeholder="Consumer Package Depth" formControlName="consumer_package_depth">
+				<mat-error *ngIf="shelfDetailsform.consumer_package_depth.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Consumer Package Height</mat-label>
+				<input matInput placeholder="Consumer Package Height" formControlName="consumer_package_height">
+				<mat-error *ngIf="shelfDetailsform.consumer_package_height.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Consumer Package Width</mat-label>
+				<input matInput placeholder="Consumer Package Width" formControlName="consumer_package_width">
+				<mat-error *ngIf="shelfDetailsform.consumer_package_width.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Consumer Package Diameter</mat-label>
+				<input matInput placeholder="Consumer Package Diameter" formControlName="consumer_package_diameter">
+				<mat-error *ngIf="shelfDetailsform.consumer_package_diameter.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<div class="ng-select-wrapper">
+				<ng-select placeholder="Consumer Package Size UOM Code" [dropdownPosition]="'bottom'" [addTag]="true"
+					[items]="RetailPackageSizeList" bindLabel="text" bindValue="id" (clear)="clear('RPS')"
+					formControlName="consumer_package_size_uomcode" appendTo="body">
+					<!-- <ng-template ng-tag-tmp let-search="searchTerm">
+									<b [ngStyle]="{'color': '#0000FF'}">Add new retail package size</b>: {{search}}
+							</ng-template> -->
+				</ng-select>
+			</div>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Consumer Package Gross Weight</mat-label>
+				<input matInput placeholder="Consumer Package Gross Weight"
+					formControlName="consumer_package_gross_weight">
+				<mat-error *ngIf="shelfDetailsform.consumer_package_gross_weight.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Consumer Package Net Weight</mat-label>
+				<input matInput placeholder="Consumer Package Net Weight" formControlName="consumer_package_net_weight">
+				<mat-error *ngIf="shelfDetailsform.consumer_package_net_weight.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Consumer Package Drained Weight</mat-label>
+				<input matInput placeholder="Consumer Package Drained Weight"
+					formControlName="consumer_package_drained_weight">
+				<mat-error *ngIf="shelfDetailsform.consumer_package_drained_weight.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Consumer Package Tare Weight</mat-label>
+				<input matInput placeholder="Consumer Package Tare Weight"
+					formControlName="consumer_package_tare_weight">
+				<mat-error *ngIf="shelfDetailsform.consumer_package_tare_weight.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<div class="ng-select-wrapper">
+				<ng-select placeholder="Consumer Package Weight UOM Code" [dropdownPosition]="'bottom'" [addTag]="true"
+					[items]="RetailPackageSizeList" bindLabel="text" bindValue="id" (clear)="clear('RPS')"
+					formControlName="consumer_package_weight_uomcode" appendTo="body">
+					<!-- <ng-template ng-tag-tmp let-search="searchTerm">
+										<b [ngStyle]="{'color': '#0000FF'}">Add new retail package size</b>: {{search}}
+								</ng-template> -->
+				</ng-select>
+			</div>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Consumer Package Net Content</mat-label>
+				<input matInput placeholder="Consumer Package Net Content"
+					formControlName="consumer_package_net_content">
+				<mat-error *ngIf="shelfDetailsform.consumer_package_net_content.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<div class="ng-select-wrapper">
+				<ng-select placeholder="Consumer Package Contents UOM Code" [dropdownPosition]="'bottom'"
+					[addTag]="true" [items]="RetailPackageSizeList" bindLabel="text" bindValue="id"
+					(clear)="clear('RPS')" formControlName="consumer_package_contents_uomcode" appendTo="body">
+					<!-- <ng-template ng-tag-tmp let-search="searchTerm">
+											<b [ngStyle]="{'color': '#0000FF'}">Add new retail package size</b>: {{search}}
+									</ng-template> -->
+				</ng-select>
+			</div>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Peg Horizontal Distance</mat-label>
+				<input matInput placeholder="Peg Horizontal Distance" formControlName="peg_horizontal_distance">
+				<mat-error *ngIf="shelfDetailsform.peg_horizontal_distance.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<mat-form-field appearance="outline">
+				<mat-label>Peg Vertical Distance</mat-label>
+				<input matInput placeholder="Peg Vertical Distance" formControlName="peg_vertical_distance">
+				<mat-error *ngIf="shelfDetailsform.peg_vertical_distance.errors?.pattern">
+					<span>Only numbers are allowed.</span>
+				</mat-error>
+			</mat-form-field>
+
+			<div class="ng-select-wrapper">
+				<ng-select placeholder="Peg Distance UOM Code" [dropdownPosition]="'bottom'" [addTag]="true"
+					[items]="RetailPackageSizeList" bindLabel="text" bindValue="id" (clear)="clear('RPS')"
+					formControlName="peg_distance_uomcode" appendTo="body">
+					<!-- <ng-template ng-tag-tmp let-search="searchTerm">
+												<b [ngStyle]="{'color': '#0000FF'}">Add new retail package size</b>: {{search}}
+										</ng-template> -->
+				</ng-select>
+			</div>
+
+		</form>
+	</div>
+</div>
+
+<div class="edit-view-footer">
+	<button mat-stroked-button cdkFocusInitial (click)="stepperNavigate('back')"
+		[hidden]="stepperConfig.currentStep == stepperConfig.initStep"><i class="icon-left-arrow ml-2"></i>Back</button>
+	<button type="button" mat-button color="accent" cdkFocusInitial class="ml-auto"
+		(click)="onNoClick()">Cancel</button>
+	<button mat-flat-button color="accent" cdkFocusInitial [hidden]="isLoading" (click)="stepperNavigate('next')"
+		(disabled)="stepperConfig.isDisabled">{{stepperConfig.doneBtnText}} <i class="icon-right-arrow ml-2"
+			[hidden]="stepperConfig.currentStep == stepperConfig.maxStep"></i></button>
+	<button [hidden]="!isLoading" mat-flat-button color="accent" disabled>Please wait... </button>
+</div>

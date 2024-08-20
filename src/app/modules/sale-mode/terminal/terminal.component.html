@@ -1,0 +1,576 @@
+<div class="sale-part">
+	<header>
+		<div class="row align-items-center">
+			<div class="col-auto">
+				<button mat-icon-button [routerLink]="['/dashboard']">
+					<i class="icon-back-left-arrow"></i>
+				</button>
+			</div>
+			<div class="col-auto">
+				<div class="page-heading">
+					<strong>{{locationName}} #{{workStationId}}</strong>
+					<!-- <span>Thu, Jan 29, 2019</span> -->
+					<span>{{today | date: 'EEE, LLL d, yyyy'}}</span>
+				</div>
+			</div>
+			<div class="col-12 col-md-auto ml-auto order-2 order-md-1">
+				<div class="user-details">
+					<div class="user-name">
+						<span>Cashier</span> {{userName}}
+					</div>
+					<div class="user-icon" [matMenuTriggerFor]="UserMenu">
+						<i class="icon-user"></i>
+					</div>
+					<mat-menu #UserMenu="matMenu" xPosition="before">
+						<button mat-menu-item>Setings</button>
+						<button (click)="lock()" mat-menu-item>Lock</button>
+						<button (click)="logout()" mat-menu-item>Logout</button>
+					</mat-menu>
+				</div>
+			</div>
+		</div>
+	</header>
+	<section class="wraper">
+		<div class="sale-table-box">
+			<ul class="pro-sale-list">
+				<li class="list-headings">
+					<div class="desc">
+						<div>Description</div>
+						<div>Item#</div>
+					</div>
+					<div class="qty">
+						<div>Qty</div>
+						<div></div>
+					</div>
+					<div class="pric">
+						<div>Each</div>
+						<div>Total</div>
+						<div>Ext</div>
+					</div>
+				</li>
+				<ng-container *ngFor="let item of cartItems; let i = index;">
+					<li *ngIf="item.isShowable" [attr.data-cart-item-index]="i"
+						[ngClass]="{'active': activeCartItemIndex == i}" #cartRow>
+						<div class="desc" (click)="cartItemIndex(cartRow, true)">
+							<div class="pro-name" data-th="Description">
+								{{item.ItemDescription}}
+							</div>
+							<div class="pro-id" data-th="Item#">
+								<span *ngFor="let upc of item.ItemUPC">
+									#{{upc}}&nbsp;
+								</span>
+							</div>
+							<!-- <div class="pro-dis" data-th="Offer">Buy 2 Save {{defaultCurrency}}1.00</div> -->
+						</div>
+						<div class="qty">
+							<div class="pro-qty" data-th="Qty">
+								<mat-form-field appearance="outline">
+									<input matInput (keydown)="_helper.validateTerminalItemQty($event)"
+										(keyup)="updateCalculation()" (blur)="resetItemQty(i)"
+										(click)="setInputElement(i, 'number', 'itemQty')"
+										(focus)="setInputElement(i, 'number', 'itemQty')"
+										[(ngModel)]="cartItems[i].ItemQty" value="{{item.ItemQty}}">
+								</mat-form-field>
+							</div>
+							<!-- <div class="pro-dis" data-th="Discount">-{{defaultCurrency}}1.00</div> -->
+						</div>
+						<div class="pric" (click)="cartItemIndex(cartRow, true)">
+							<div class="pro-price" data-th="Each">
+								{{defaultCurrency}}{{item.ItemPrice | number: '1.2-2'}}</div>
+							<div class="pro-price" data-th="Total">
+								{{defaultCurrency}}{{item.ItemTotalPrice | number: '1.2-2'}}
+							</div>
+							<!-- <div class="pro-price" data-th="Ext">{{defaultCurrency}}212.98</div> -->
+						</div>
+					</li>
+				</ng-container>
+				<li class="justify-content-center" *ngIf="!cartItems.length">
+					No product added yet
+				</li>
+			</ul>
+		</div>
+		<div class="sale-payment">
+			<div class="sale-details-box">
+				<div class="item-name" [ngSwitch]="activeInputView">
+					<!-- [hidden]="activeInputView != 'product'" -->
+					<div class="row justify-content-between" *ngSwitchCase="'product'">
+						<div class="col">
+							<div class="scan-pro">
+								<i class="icon-searching"></i>
+								<input [(ngModel)]="barcode.code" (keyup)="initSearch($event)"
+									(focus)="barcodeInputHasFocus = true; setInputElement('barcode.code', 'string', 'barcode');"
+									(click)="barcodeInputHasFocus = true; setInputElement('barcode.code', 'string', 'barcode');"
+									(blur)="barcodeInputHasFocus = false;" type="text" value=""
+									placeholder="{{barcodeInputHasFocus ? barcodeText.focus : barcodeText.blur}}"
+									#barcodeInput>
+								<i *ngIf="!showBarcodeLoader" class="icon-barcode1"></i>
+								<svg *ngIf="showBarcodeLoader" version="1.1" id="loader-1"
+									xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+									x="0px" y="0px" width="40px" height="40px" viewBox="0 0 50 50"
+									style="enable-background:new 0 0 50 50;" xml:space="preserve">
+									<path fill="#000"
+										d="M25.251,6.461c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z"
+										transform="rotate(355.788 25 25)">
+										<animateTransform attributeType="xml" attributeName="transform" type="rotate"
+											from="0 25 25" to="360 25 25" dur="0.6s" repeatCount="indefinite">
+										</animateTransform>
+									</path>
+								</svg>
+								<div class="serch-result"
+									[ngClass]="{'active': barcode.code.length && barcodeSearchData.length}">
+									<ul>
+										<!-- <li>
+											<div class="icon">
+												<i class="icon-box"></i>
+											</div>
+											<strong>{{barcode.code}}</strong>&nbsp; in Products
+										</li> -->
+										<!-- [innerHtml]="data.UPC + '&nbsp;&nbsp;|&nbsp;&nbsp;' + data.ItemName + '&nbsp;&nbsp;|&nbsp;&nbsp;' + defaultCurrency+data.ItemPrice | highlight: barcode.code" -->
+										<li *ngFor="let data of barcodeSearchData; let i = index;"
+											(click)="data.UPC ? chooseUPC(data.UPC) : null"
+											[hidden]="!data.UPC || data.UPC == '' || data.EmptyResult"
+											[ngClass]="{'active': activeSearchDataIndex == i}" matRipple>
+											<span class="upc" [innerHtml]="data.UPC | highlight: barcode.code"></span>
+											<span class="items-name"
+												[innerHtml]="data.ItemName | highlight: barcode.code"></span>
+											<span class="items-price">{{defaultCurrency + data.ItemPrice}}</span>
+										</li>
+										<li *ngFor="let data of barcodeSearchData; let i = index;"
+											[hidden]="data.UPC && data.UPC != '' && !data.EmptyResult"
+											[innerHtml]="data.EmptyResult"></li>
+										<!-- <li matRipple><a href="#" class="text-primary">See more</a></li> -->
+									</ul>
+								</div>
+							</div>
+						</div>
+						<div class="col-auto">{{defaultCurrency}}{{barcode.price | number: '1.2-2'}}</div>
+					</div>
+					<!-- [hidden]="activeInputView != 'customer'" -->
+					<div class="row justify-content-between" *ngSwitchCase="'customer'">
+						<div class="col">
+							<div class="scan-pro">
+								<i class="icon-searching"></i>
+								<input [(ngModel)]="custNameSearch" (keyup)="initSearch($event)"
+									(focus)="custNameSearchInputHasFocus = true; setInputElement('custNameSearch', 'string', 'customerNameSearch');"
+									(click)="custNameSearchInputHasFocus = true; setInputElement('custNameSearch', 'string', 'customerNameSearch');"
+									(blur)="custNameSearchInputHasFocus = false;" type="text" value=""
+									placeholder="{{custNameSearchInputHasFocus ? 'Search Customer' : 'Tap here & search customer'}}"
+									#custNameSearchInput>
+								<i *ngIf="!custNameSearchLoader" class="icon-user1"></i>
+								<svg *ngIf="custNameSearchLoader" version="1.1" id="loader-1"
+									xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+									x="0px" y="0px" width="40px" height="40px" viewBox="0 0 50 50"
+									style="enable-background:new 0 0 50 50;" xml:space="preserve">
+									<path fill="#000"
+										d="M25.251,6.461c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615V6.461z"
+										transform="rotate(355.788 25 25)">
+										<animateTransform attributeType="xml" attributeName="transform" type="rotate"
+											from="0 25 25" to="360 25 25" dur="0.6s" repeatCount="indefinite">
+										</animateTransform>
+									</path>
+								</svg>
+								<div class="serch-result"
+									[ngClass]="{'active': custNameSearch.length && custNameSearchData.length}">
+									<ul>
+										<li *ngFor="let data of custNameSearchData; let i = index;"
+											(click)="data.CustomerName ? chooseCustomer(i, true) : null"
+											[innerHtml]="data.CustomerName | highlight: custNameSearch"
+											[hidden]="data.EmptyResult"
+											[ngClass]="{'active': activeSearchDataIndex == i}" matRipple></li>
+										<li (click)="addCustomer()"
+											*ngFor="let data of custNameSearchData; let i = index;"
+											[hidden]="!data.EmptyResult" [innerHtml]="data.EmptyResult"></li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- [hidden]="activeInputView != 'amount'" -->
+					<div class="row justify-content-between" *ngSwitchCase="'amount'">
+						<div class="col">
+							<div class="scan-pro">
+								<i class="icon-dollar"></i>
+								<input [(ngModel)]="saleCashAmount"
+									(focus)="saleAmountInputHasFocus = true; setInputElement('saleCashAmount', 'decimal', 'saleAmount');"
+									(click)="saleAmountInputHasFocus = true; setInputElement('saleCashAmount', 'decimal', 'saleAmount');"
+									(blur)="saleAmountInputHasFocus = false;" type="text" value=""
+									placeholder="{{saleAmountInputHasFocus ? 'Enter Amount' : 'Tap here & enter amount'}}"
+									#saleAmountInput>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="item-price">
+					<div class="row pb-3">
+						<div class="col-4">
+							<div class="row">
+								<div [ngClass]="(customer.name.length == 2) ? 'col-7' : 'col-12'">Customer:</div>
+								<div [ngClass]="(customer.name.length == 2) ? 'col-5' : 'col-12'">{{customer.name}}
+								</div>
+							</div>
+							<!-- <hr> -->
+							<div class="row">
+								<div class="col-7">FS Total:</div>
+								<div class="col-5">0.00</div>
+							</div>
+							<div class="row">
+								<div class="col-7">WIC Total:</div>
+								<div class="col-5">0.00</div>
+							</div>
+							<div class="row font-weight-bold">
+								<div class="col-7">Item Count:</div>
+								<div class="col-5">{{cartDetails.itemCount}}</div>
+							</div>
+						</div>
+						<div class="col-8 text-right">
+							<div class="row">
+								<div class="col-6">Points</div>
+								<div class="col-6">{{customer.point}}</div>
+							</div>
+							<!-- <hr> -->
+							<div class="row font-weight-bold text-right">
+								<div class="col-6">Subtotal</div>
+								<div class="col-6">
+									{{defaultCurrency}}{{cartDetails.subtotal | number: '1.2-2'}}</div>
+							</div>
+							<div class="row font-weight-bold text-right">
+								<div class="col-6">Discount</div>
+								<div class="col-6">
+									{{defaultCurrency}}{{cartDetails.discount | number: '1.2-2'}}</div>
+							</div>
+							<div class="row font-weight-bold text-right">
+								<div class="col-6">Sales Tax</div>
+								<div class="col-6">
+									{{defaultCurrency}}{{cartDetails.salesTax | number: '1.2-2'}}</div>
+							</div>
+							<div class="row font-weight-bold text-right">
+								<div class="col-6">Total</div>
+								<div class="col-6">{{defaultCurrency}}{{cartDetails.total | number: '1.2-2'}}
+								</div>
+							</div>
+							<div class="row font-weight-bold text-right">
+								<div class="col-6">Payments</div>
+								<div class="col-6">
+									{{defaultCurrency}}{{cartDetails.payments | number: '1.2-2'}}</div>
+							</div>
+							<!-- <div class="row item-total-bal font-weight-bold text-right">
+								<div class="col-6">Balance</div>
+								<div class="col-6">
+									{{defaultCurrency}}{{openingBalance | number: '1.2-2'}}</div>
+							</div> -->
+							<div *ngIf="cartDetails.balance != 0 || cartDetails.change == 0"
+								class="row item-total-bal font-weight-bold text-right">
+								<div class="col-6">Due</div>
+								<div class="col-6">
+									{{defaultCurrency}}{{cartDetails.balance | number: '1.2-2'}}</div>
+							</div>
+							<div *ngIf="cartDetails.change != 0" class="row item-total-bal font-weight-bold text-right">
+								<div class="col-6">Changes</div>
+								<div class="col-6">
+									{{defaultCurrency}}{{cartDetails.change | number: '1.2-2'}}</div>
+							</div>
+						</div>
+					</div>
+					<!-- <div class="row">
+						<div class="col-4">
+
+						</div>
+						<div class="col-8 font-weight-bold text-right">
+
+						</div>
+					</div> -->
+				</div>
+			</div>
+			<div class="sale-keybord" (mousedown)="ignoreFocus($event)">
+				<div class="option-part" [ngClass]="{'d-none': activeView == 'cash'}">
+					<ul>
+						<li (click)="manageLookup()"
+							[ngClass]="{'active': isLookupEnable && activeInputView == 'product'}">
+							<div matRipple [matRippleColor]="rippleColor" class="sky1-bg">
+								Lookup
+							</div>
+						</li>
+						<li>
+							<div matRipple [matRippleColor]="rippleColor" class="">
+								Other
+							</div>
+						</li>
+						<li (click)="manageView('main', 'customer')"
+							[ngClass]="{'active': activeInputView == 'customer'}">
+							<div matRipple [matRippleColor]="rippleColor" class="pink8-bg">
+								Customer</div>
+						</li>
+						<li>
+							<div matRipple [matRippleColor]="rippleColor" class="">
+								Charge</div>
+						</li>
+						<li>
+							<div matRipple [matRippleColor]="rippleColor" class="deep-purpel-bg">Items</div>
+						</li>
+						<li>
+							<div matRipple [matRippleColor]="rippleColor" class="green7-bg">Check</div>
+						</li>
+						<li (click)="manageView('function')" [ngClass]="{'active': activeView == 'function'}">
+							<div matRipple [matRippleColor]="rippleColor" class="blue-grey-bg">
+								Function</div>
+						</li>
+						<li>
+							<div matRipple [matRippleColor]="rippleColor" class="gray9-bg">Subtotal</div>
+						</li>
+						<li>
+							<div matRipple [matRippleColor]="rippleColor" class="red2-bg">Discount</div>
+						</li>
+						<li (click)="manageView('cash', 'amount');" [ngClass]="{'active': activeView == 'cash'}">
+							<div matRipple [matRippleColor]="rippleColor" class="green7-bg">
+								Cash</div>
+						</li>
+					</ul>
+					<!-- <ul [ngClass]="{'d-none': activeView == defaultView || activeView == 'function'}">
+						<li></li>
+						<li></li>
+						<li></li>
+						<li (click)="setSaleCashAmount('1')">
+							<div matRipple [matRippleColor]="rippleColor" class="green-bg1">
+								{{defaultCurrency}}1</div>
+						</li>
+						<li (click)="setSaleCashAmount('5')">
+							<div matRipple [matRippleColor]="rippleColor" class="green-bg1">
+								{{defaultCurrency}}5</div>
+						</li>
+						<li (click)="setSaleCashAmount('10')">
+							<div matRipple [matRippleColor]="rippleColor" class="green-bg1">
+								{{defaultCurrency}}10</div>
+						</li>
+						<li (click)="setSaleCashAmount('20')">
+							<div matRipple [matRippleColor]="rippleColor" class="green-bg1">
+								{{defaultCurrency}}20</div>
+						</li>
+						<li (click)="setSaleCashAmount('50')">
+							<div matRipple [matRippleColor]="rippleColor" class="green-bg1">
+								{{defaultCurrency}}50</div>
+						</li>
+						<li (click)="setSaleCashAmount('100')">
+							<div matRipple [matRippleColor]="rippleColor" class="green-bg1">
+								{{defaultCurrency}}100</div>
+						</li>
+						<li (click)="manageView(defaultView, defaultInputView)">
+							<div matRipple [matRippleColor]="rippleColor" class="red1-bg">
+								Close</div>
+						</li>
+					</ul> -->
+				</div>
+				<div class="digit-part cash-box"
+					[ngClass]="{'d-none': activeView == defaultView || activeView == 'function'}">
+					<ul>
+						<li *ngFor="let denomination of denominationList; let i = index;"
+							(click)="denomination.MonetaryValueAmount ? setSaleCashAmount(denomination.MonetaryValueAmount, denomination.id) : null"
+							matRipple [matRippleColor]="rippleColor"
+							[ngClass]="{'gray-bg': !denomination.MonetaryValueAmount, 'green-bg1': denomination.MonetaryValueAmount, 'text': true}">
+							{{denomination.MonetaryValueAmount ? defaultCurrency + denomination.MonetaryValueAmount : ''}}
+						</li>
+						<li (click)="manageView(defaultView, defaultInputView)" matRipple [matRippleColor]="rippleColor"
+							class="text red1-bg">
+							Close
+						</li>
+					</ul>
+				</div>
+				<div class="digit-part">
+					<ul>
+						<li (click)="terminalKeypad('clear')" matRipple [matRippleColor]="rippleColor"
+							class="text violet4-bg">
+							Clear</li>
+						<li [ngClass]="{'active': scanWithQty.isQtySet}" (click)="setScanWithQty()" matRipple
+							[matRippleColor]="rippleColor" class="text">X/Qty
+						</li>
+						<li (click)="terminalKeypad('enter')" matRipple [matRippleColor]="rippleColor"
+							class="text green2-bg">
+							Enter</li>
+						<li (click)="terminalKeypad('1')" matRipple [matRippleColor]="rippleColor">1</li>
+						<li (click)="terminalKeypad('2')" matRipple [matRippleColor]="rippleColor">2</li>
+						<li (click)="terminalKeypad('3')" matRipple [matRippleColor]="rippleColor">3</li>
+						<li (click)="terminalKeypad('4')" matRipple [matRippleColor]="rippleColor">4</li>
+						<li (click)="terminalKeypad('5')" matRipple [matRippleColor]="rippleColor">5</li>
+						<li (click)="terminalKeypad('6')" matRipple [matRippleColor]="rippleColor">6</li>
+						<li (click)="terminalKeypad('7')" matRipple [matRippleColor]="rippleColor">7</li>
+						<li (click)="terminalKeypad('8')" matRipple [matRippleColor]="rippleColor">8</li>
+						<li (click)="terminalKeypad('9')" matRipple [matRippleColor]="rippleColor">9</li>
+						<li (click)="terminalKeypad('00')" matRipple [matRippleColor]="rippleColor">00</li>
+						<li (click)="terminalKeypad('0')" matRipple [matRippleColor]="rippleColor">0</li>
+						<li (click)="terminalKeypad('.')" matRipple [matRippleColor]="rippleColor">.</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="option-item" [ngClass]="{'active': activeView != defaultView}">
+			<ul class="item-list" [ngClass]="{'d-none': activeView != 'function'}">
+				<li matRipple [matRippleColor]="rippleColor" class="gray-bg">Price Check</li>
+				<li matRipple [matRippleColor]="rippleColor" class="violet4-bg">Function</li>
+				<li matRipple [matRippleColor]="rippleColor" class="green4-bg">Reprint
+					Receipt</li>
+				<li matRipple [matRippleColor]="rippleColor" class="brown2-bg">Suspend Sale</li>
+				<li matRipple [matRippleColor]="rippleColor" class="brown1-bg">Paid Out</li>
+				<li (click)="removeItem()" matRipple [matRippleColor]="rippleColor" class="green2-bg">Void</li>
+				<li matRipple [matRippleColor]="rippleColor" class="sky1-bg">Resume Sale</li>
+				<li matRipple [matRippleColor]="rippleColor" class="red1-bg">Paid In</li>
+				<li (click)="resetSale()" matRipple [matRippleColor]="rippleColor" class="pink1-bg">Cancel</li>
+				<li matRipple [matRippleColor]="rippleColor" class="violet2-bg">No Sale</li>
+				<li matRipple [matRippleColor]="rippleColor" class="blue-bg">Other</li>
+				<li matRipple [matRippleColor]="rippleColor" class="green3-bg">Refund</li>
+			</ul>
+		</div>
+	</section>
+	<div class="sale-box-bg" [ngClass]="{'active':  false}">
+		<div class="cash-calc">
+			<div class="cash-input">
+				<div class="row align-items-center">
+					<div class="col-3">
+						<div class="sale-input">
+							<label for="">Cost</label>
+						</div>
+					</div>
+					<div class="col">
+						<div class="sale-input">
+							<mat-form-field appearance="outline" color="transparent" class="text-right">
+								<input matInput>
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div class="row align-items-center">
+					<div class="col-3">
+						<div class="sale-input">
+							<label for="">Tender</label>
+						</div>
+					</div>
+					<div class="col">
+						<div class="sale-input">
+							<mat-form-field appearance="outline" color="transparent" class="text-right">
+								<input matInput>
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="sale-keybord">
+
+				<div class="option-part">
+					<ul>
+						<li>
+							<div matRipple [matRippleColor]="rippleColor">{{defaultCurrency}}5</div>
+						</li>
+						<li>
+							<div matRipple [matRippleColor]="rippleColor">{{defaultCurrency}}10</div>
+						</li>
+						<li>
+							<div matRipple [matRippleColor]="rippleColor">{{defaultCurrency}}20</div>
+						</li>
+						<li>
+							<div matRipple [matRippleColor]="rippleColor">{{defaultCurrency}}30</div>
+						</li>
+						<li>
+							<div matRipple [matRippleColor]="rippleColor">{{defaultCurrency}}40</div>
+						</li>
+						<li>
+							<div matRipple [matRippleColor]="rippleColor">{{defaultCurrency}}50</div>
+						</li>
+						<li>
+							<div matRipple [matRippleColor]="rippleColor">{{defaultCurrency}}100</div>
+						</li>
+						<li class="text">
+							<div matRipple [matRippleColor]="rippleColor" class="red-bg">
+								Close</div>
+						</li>
+					</ul>
+				</div>
+				<div class="digit-part">
+					<ul>
+						<li matRipple [matRippleColor]="rippleColor">1</li>
+						<li matRipple [matRippleColor]="rippleColor">2</li>
+						<li matRipple [matRippleColor]="rippleColor">3</li>
+						<li matRipple [matRippleColor]="rippleColor">4</li>
+						<li matRipple [matRippleColor]="rippleColor">5</li>
+						<li matRipple [matRippleColor]="rippleColor">6</li>
+						<li matRipple [matRippleColor]="rippleColor">7</li>
+						<li matRipple [matRippleColor]="rippleColor">8</li>
+						<li matRipple [matRippleColor]="rippleColor">9</li>
+						<li matRipple [matRippleColor]="rippleColor" class="text">Clear</li>
+						<li matRipple [matRippleColor]="rippleColor">0</li>
+						<li matRipple [matRippleColor]="rippleColor" class="text">OK</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="sale-box-bg">
+		<div mat-dialog-content>
+			<div class="row align-items-center">
+				<div class="col-3">
+					<div class="sale-input">
+						<label for="">Mobile</label>
+					</div>
+				</div>
+				<div class="col">
+					<div class="sale-input">
+						<mat-form-field appearance="outline">
+							<input matInput>
+						</mat-form-field>
+					</div>
+				</div>
+			</div>
+			<div class="row align-items-center">
+				<div class="col-3">
+					<div class="sale-input">
+						<label for="">Name</label>
+					</div>
+				</div>
+				<div class="col">
+					<div class="sale-input">
+						<mat-form-field appearance="outline">
+							<input matInput>
+						</mat-form-field>
+					</div>
+				</div>
+			</div>
+			<div class="row align-items-center">
+				<div class="col-3">
+					<div class="sale-input">
+						<label for="">Email</label>
+					</div>
+				</div>
+				<div class="col">
+					<div class="sale-input">
+						<mat-form-field appearance="outline">
+							<input matInput>
+						</mat-form-field>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-3">
+					<div class="sale-input">
+						<label for="">Address</label>
+					</div>
+				</div>
+				<div class="col">
+					<div class="sale-input">
+						<mat-form-field appearance="outline">
+							<textarea matInput rows="3"></textarea>
+						</mat-form-field>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-3"></div>
+				<div class="col">
+					<div class="row">
+						<div class="col-6 sale-input">
+							<button mat-flat-button color="red">Cancel</button>
+						</div>
+						<div class="col-6 sale-input">
+							<button mat-flat-button color="blue">Save</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>

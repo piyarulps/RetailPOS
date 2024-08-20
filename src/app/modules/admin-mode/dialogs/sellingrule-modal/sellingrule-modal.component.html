@@ -1,0 +1,421 @@
+<div class="pop-heading" mat-dialog-title> {{dialogTitle}}
+  <div class="d-inline-flex">
+    <button mat-icon-button  (click)="_dialogRef.close()"><i class="icon-cursor"></i></button>
+  </div>
+</div>
+<form [formGroup]="addModuleForm" (ngSubmit)="onSubmit()">
+  <div mat-dialog-content>
+    <div class="box">
+      <div class="row">
+        <div class="col-md-4" [hidden]="editData.length && editData.length > 1">
+          <mat-form-field appearance="outline">
+            <mat-label>Name*</mat-label>
+            <input matInput formControlName="sellingName">
+            <mat-error *ngIf="(f.sellingName.touched || f.sellingName.dirty || submitted)">
+              <span *ngIf="f.sellingName.errors?.required">Selling Name is required.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4" [hidden]="editData.length && editData.length > 1">
+          <mat-form-field appearance="outline">
+            <mat-label>Descripition</mat-label>
+            <input matInput formControlName="sellingDescription">
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Process Mode</mat-label>
+            <mat-select formControlName="processMode">
+              <mat-option value="">
+                None
+              </mat-option>
+              <mat-option *ngFor="let processMode of processMode" [value]="processMode.id">
+                {{processMode.text}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Quantity Key Action Mode</mat-label>
+            <mat-select formControlName="quantityKeyActionMode">
+              <mat-option value="">
+                None
+              </mat-option>
+              <mat-option value="Required">
+                Required
+              </mat-option>
+              <mat-option value="Prohibited">
+                Prohibited
+              </mat-option>
+              <mat-option value="Optional">
+                Optional
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Item Tender Restriction Group Code</mat-label>
+            <mat-select formControlName="itemTenderRestrictionGroupCode">
+              <mat-option value="">
+                None
+              </mat-option>
+              <mat-option *ngFor="let itemTenderRestrictionGroupCode of itemTenderRestrictionGroupCode"
+                [value]="itemTenderRestrictionGroupCode.id">
+                {{itemTenderRestrictionGroupCode.text}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Frequent Shopper Point Count</mat-label>
+            <input matInput formControlName="frequentShopperPointCount">
+            <mat-error *ngIf="(f.frequentShopperPointCount.touched || f.frequentShopperPointCount.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.frequentShopperPointCount.errors?.pattern">Enter a valid count.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Allow Employee Discount</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="allowEmployeeDiscount">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-md-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Allow Food Stamps</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="allowFoodStamp">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-md-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Allow Multiple Coupon</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChangeAllowMultipleCoupon($event)"
+              formControlName="allowMultipleCoupon">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-md-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Allow WIC</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="allowWIC">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-md-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Allow Give Away</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="allowGiveAway">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-md-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Coupon Restricted</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChangeCouponRestricted($event)"
+              formControlName="couponRestricted">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-md-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Electronics Coupon</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="electronicsCoupon">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-sm-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Frequent Shopper Point Eligible</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="frequentShopperPointEligible">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-sm-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Must Verify Price</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="mustVerifyPrice">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-md-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Return Prohibited</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="returnProhibited">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-md-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Requires Price Entry</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="requiresPriceEntry">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-md-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Requires Weight Entry</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="requiresWeightEntry">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-sm-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Repeat Key Prohibited</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="repeatKeyProhibited">
+            </mat-slide-toggle>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--        Start:Password Product     --->
+      <div class="sub-header">Passport Product</div>
+      <div class="row">
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Max Amount in $</mat-label>
+            <input matInput formControlName="passMaxAmount">
+            <mat-error *ngIf="(f.passMaxAmount.touched || f.passMaxAmount.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.passMaxAmount.errors?.pattern">Enter a valid Amount.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Modifier Quantity</mat-label>
+            <input matInput formControlName="passModifierQuantity">
+            <mat-error *ngIf="(f.passModifierQuantity.touched || f.passModifierQuantity.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.passModifierQuantity.errors?.pattern">Enter a valid Quantity.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Open</mat-label>
+            <input matInput formControlName="passOpen">
+            <mat-error *ngIf="(f.passOpen.touched || f.passOpen.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.passOpen.errors?.pattern">Enter a valid value.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Food Stamp</mat-label>
+            <input matInput formControlName="passFoodStamp">
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Discount</mat-label>
+            <input matInput formControlName="passDiscount">
+            <!-- <mat-select matSuffix formControlName="passDiscountType">
+              <mat-option value="percentage">Percentage</mat-option>
+              <mat-option value="amount">Fixed amount</mat-option>
+            </mat-select> -->
+            <mat-error *ngIf="(f.passDiscount.touched || f.passDiscount.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.passDiscount.errors?.pattern">Enter a valid Discount.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Qty Not Allow</mat-label>
+            <input matInput formControlName="passQuantityNotAllow">
+            <mat-error *ngIf="(f.passQuantityNotAllow.touched || f.passQuantityNotAllow.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.passQuantityNotAllow.errors?.pattern">Enter a valid Qty.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Qty Required</mat-label>
+            <input matInput formControlName="passQuantityRequired">
+            <!-- <mat-select matSuffix formControlName="passQuantityRequiredType">
+              <mat-option value="pound">Pound</mat-option>
+              <mat-option value="kg">Kg</mat-option>
+              <mat-option value="number">Number</mat-option>
+            </mat-select> -->
+            <mat-error *ngIf="(f.passQuantityRequired.touched || f.passQuantityRequired.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.passQuantityRequired.errors?.pattern">Enter a valid Qty.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    <!--  End:Password Product  -->
+    <!--  Start:Sapphire Product  -->
+      <div class="sub-header">Sapphire Product</div>
+      <div class="row">
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Tax1</mat-label>
+            <input matInput formControlName="sappTax1">
+            <mat-error *ngIf="(f.sappTax1.touched || f.sappTax1.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.sappTax1.errors?.pattern">Enter a valid tax.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Tax2</mat-label>
+            <input matInput formControlName="sappTax2">
+            <mat-error *ngIf="(f.sappTax2.touched || f.sappTax2.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.sappTax2.errors?.pattern">Enter a valid tax.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">May Not Be Sold</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="sappMayNotBeSold">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Tax3</mat-label>
+            <input matInput formControlName="sappTax3">
+            <mat-error *ngIf="(f.sappTax3.touched || f.sappTax3.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.sappTax3.errors?.pattern">Enter a valid tax.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Tax4</mat-label>
+            <input matInput formControlName="sappTax4">
+            <mat-error *ngIf="(f.sappTax4.touched || f.sappTax4.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.sappTax4.errors?.pattern">Enter a valid tax.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Is Not Returnable</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="sappIsNotReturnable">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Check ID1</mat-label>
+            <input matInput formControlName="sappCheckId1">
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Check ID2</mat-label>
+            <input matInput formControlName="sappCheckId2">
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Blue Law1 Applier</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="sappBlueLaw1Apple">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <!-- <div class="col-sm-4 ">
+                          <mat-form-field appearance="outline">
+                            <mat-label>Food Stamp</mat-label>
+                            <input matInput formControlName="sappFoodStamp">
+                          </mat-form-field>
+                        </div> -->
+
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Fractional Quantity</mat-label>
+            <input matInput formControlName="sappFractionalQuantity">
+            <mat-error *ngIf="(f.sappFractionalQuantity.touched || f.sappFractionalQuantity.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.sappFractionalQuantity.errors?.pattern">Enter a valid Qty.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Open</mat-label>
+            <input matInput formControlName="sappOpen">
+            <mat-error *ngIf="(f.sappOpen.touched || f.sappOpen.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.sappOpen.errors?.pattern">Enter a valid value.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Blue Law2 Applier</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="sappBlueLaw2Apple">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Special Discount Allow</mat-label>
+            <input matInput formControlName="sappSpecialDiscountAllow">
+            <mat-error *ngIf="(f.sappSpecialDiscountAllow.touched || f.sappSpecialDiscountAllow.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.sappSpecialDiscountAllow.errors?.pattern">Enter a valid value.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Department Special Discount</mat-label>
+            <input matInput formControlName="sappDepartmentSpecialDiscount">
+            <mat-error
+              *ngIf="(f.sappDepartmentSpecialDiscount.touched || f.sappDepartmentSpecialDiscount.dirty || submitted)">
+              <span *ngIf="addModuleForm.controls.sappDepartmentSpecialDiscount.errors?.pattern">Enter a valid
+                value.</span>
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Modify Item</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="sappModifyItem">
+            </mat-slide-toggle>
+          </div>
+        </div>
+        <div class="col-sm-4 ">
+          <mat-form-field appearance="outline">
+            <mat-label>Lotto Tracking</mat-label>
+            <input matInput formControlName="sappLottoTracking">
+          </mat-form-field>
+        </div>
+        <div class="col-sm-4 ">
+          <div class="form-group d-flex justify-content-between align-items-center">
+            <label for="">Item Not Cached On POS</label>
+            <mat-slide-toggle color="primary" [checked]="checked" (change)="onChange($event)"
+              formControlName="sappItemNotCachedOnPos">
+            </mat-slide-toggle>
+          </div>
+        </div>
+      </div>
+    <!--  End:Sapphire Product  -->
+  </div>
+  <div mat-dialog-actions class="pop-footer">
+      <!-- <button  mat-stroked-button  class="ml-auto" cdkFocusInitial>Cancel</button>
+      <button mat-flat-button color="accent"  cdkFocusInitial>Create</button> -->
+
+    <button mat-flat-button color="accent"  cdkFocusInitial  type="submit"
+      [ngClass]="{'btn-loader': isLoading}">{{btnValue}}<i [hidden]="isLoading"></i></button>
+    <button  mat-stroked-button  class="ml-auto" cdkFocusInitial (click)="backProgress()">Cancel</button>
+  </div>
+</form>

@@ -1,0 +1,304 @@
+<div class="pop-heading" mat-dialog-title>Manage Conditions
+	<div class="d-inline-flex">
+		<button mat-icon-button (click)="_dialogRef.close(false)"><i class="icon-cursor"></i></button>
+	</div>
+</div>
+<div mat-dialog-content>
+	<!-- <mat-tab-group mat-align-tabs="center" (selectedTabChange)="matTabChange($event)"> -->
+	<!-- <mat-tab label="Create"> -->
+	<form [formGroup]="addCustomFeildForm" #groupItemForm="ngForm" [hidden]="currentViewType != 0">
+		<!-- <div class="row align-items-center">
+					<div class=" col-md-12">
+						<mat-form-field appearance="outline">
+							<mat-label>Group Name</mat-label>
+							<input matInput placeholder="Group Name" formControlName="description">
+							<mat-error *ngIf="(f.description.touched || f.description.dirty || submitted)">
+								<span *ngIf="f.description.errors?.required">Select value for
+									Group Name.</span>
+							</mat-error>
+						</mat-form-field>
+					</div>
+				</div> -->
+		<ul class="group-list" formArrayName="filter">
+			<li *ngFor="let itemrow of addCustomFeildForm.controls.filter['controls']; let i=index" [formGroupName]="i">
+				<div class="row align-items-center">
+					<div class=" col-md-6 col-lg-3">
+						<mat-form-field appearance="outline">
+							<mat-label>Name</mat-label>
+							<mat-select formControlName="field">
+								<ng-container *ngFor="let column of allColumns">
+									<mat-option *ngIf="column.filterDisplay" [value]="column.dbName"
+										[disabled]="selectedCols.includes(column.dbName)"
+										(click)="funOpenDialog(column.dbName,column.model,i); setText(i, 'showName', column.name);">
+										{{column.name}}
+									</mat-option>
+								</ng-container>
+								<mat-error
+									*ngIf="((getContactsFormGroup(i).controls['field'].touched ||  getContactsFormGroup(i).controls['field'].dirty || submitted) && getContactsFormGroup (i).controls['field'].hasError('required'))">
+									<span>Select value for Name.</span>
+								</mat-error>
+							</mat-select>
+						</mat-form-field>
+					</div>
+					<div class="col-md-6 col-lg-3" *ngIf="singlecolInfo[i]!=null">
+						<mat-form-field appearance="outline">
+							<mat-label>Operator</mat-label>
+							<mat-select formControlName="type">
+								<mat-option *ngFor="let icon of singlecolInfo[i].condition" [value]="icon.class"
+									(click)="setText(i, 'showOperator', icon.displayname)">
+									{{icon.displayname}}
+								</mat-option>
+							</mat-select>
+							<mat-error
+								*ngIf="((getContactsFormGroup(i).controls['type'].touched || getContactsFormGroup(i).controls['type'].dirty || submitted) && getContactsFormGroup(i).controls['type'].hasError('required'))">
+								<span>Select value for operator.</span>
+							</mat-error>
+						</mat-form-field>
+					</div>
+					<div class="col-md-6 col-lg-3" *ngIf="singlecolInfo[i]!=null && singlecolInfo[i].urlslookup!=null">
+						<ng-select (change)="setText(i, 'showValue', $event)"
+							[ngClass]="{'ng-error': (getContactsFormGroup(i).controls['value'].touched ||getContactsFormGroup(i).controls['value'].dirty || submitted) && getContactsFormGroup(i).controls['value'].hasError('required')}"
+							[dropdownPosition]="'bottom'" [items]="filterDropDownList[i]" bindLabel="text"
+							bindValue="id" placeholder="Select any option" formControlName="value" [multiple]="true"
+							appendTo='body'>
+						</ng-select>
+						<mat-error
+							*ngIf="((getContactsFormGroup(i).controls['value'].touched || getContactsFormGroup(i).controls['value'].dirty || submitted) && getContactsFormGroup(i).controls['value'].hasError('required'))">
+							<span>Select value for option.</span>
+						</mat-error>
+					</div>
+					<div class="col-md-6 col-lg-3"
+						*ngIf="singlecolInfo[i]!=null && (singlecolInfo[i].coltype=='Character' || singlecolInfo[i].coltype=='Text') && singlecolInfo[i].urlslookup == null">
+						<mat-form-field appearance="outline">
+							<mat-label>{{singlecolInfo[i].name}}</mat-label>
+							<input matInput formControlName="value" (keyup)="setText(i, 'showValue', $event)">
+							<mat-error
+								*ngIf="((getContactsFormGroup(i).controls['value'].touched || getContactsFormGroup(i).controls['value'].dirty || submitted) && getContactsFormGroup(i).controls['value'].hasError('required'))">
+								<span>Select value for option.</span>
+							</mat-error>
+						</mat-form-field>
+					</div>
+					<div class="col-md-6 col-lg-3"
+						*ngIf="singlecolInfo[i]!=null && (singlecolInfo[i].coltype=='Decimal' || singlecolInfo[i].coltype=='Integer') && singlecolInfo[i].urlslookup == null">
+						<mat-form-field appearance="outline">
+							<mat-label>{{singlecolInfo[i].name}}</mat-label>
+							<input matInput formControlName="value" (keyup)="setText(i, 'showValue', $event)">
+							<mat-error
+								*ngIf="((getContactsFormGroup(i).controls['value'].touched || getContactsFormGroup(i).controls['value'].dirty || submitted) && getContactsFormGroup(i).controls['value'].hasError('required'))">
+								<span>Select value for option.</span>
+							</mat-error>
+						</mat-form-field>
+					</div>
+					<div class="col-auto ml-auto">
+						<button type="button" *ngIf="addCustomFeildForm.controls.filter.controls.length > 1"
+							mat-stroked-button color="" cdkFocusInitial class="btn-box"
+							(click)="deleteRow(i,singlecolInfo[i]?.dbName)">
+							<i class="icon-close"></i>
+						</button>
+					</div>
+					<div class="or">
+						<mat-form-field appearance="outline">
+							<mat-select [(ngModel)]="selected" formControlName="condition">
+								<mat-option value="AND">AND</mat-option>
+								<!-- <mat-option value="OR">OR</mat-option> -->
+							</mat-select>
+						</mat-form-field>
+					</div>
+				</div>
+			</li>
+			<li>
+				<button mat-stroked-button color="primary" type="button" (click)="addNewRow()">
+					<i class="icon-plus mr-2"></i> Add More
+				</button>
+			</li>
+		</ul>
+	</form>
+	<!-- </mat-tab> -->
+	<!-- <mat-tab label="Preview"> -->
+	<div class="table-action" [hidden]="currentViewType != 1">
+		<div [hidden]="!isSpinnerLoaderShow" class="loader-bg">
+			<mat-spinner></mat-spinner>
+		</div>
+		<div class="table-list" [hidden]="isSpinnerLoaderShow">
+			<table *ngIf="dataSource.data.length" mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8"
+				(matSortChange)="sortData($event)">
+				<ng-container matColumnDef="POSItemID">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Product # </th>
+					<td mat-cell *matCellDef="let item" data-label="Product #">
+						{{item.business_unit_group_item[0]?.site_identity[0]?.POSItemID}}
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="Description">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Description </th>
+					<td mat-cell *matCellDef="let item" data-label="Description"> {{item.Description}} </td>
+				</ng-container>
+
+				<ng-container matColumnDef="LongDescription">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Long Description </th>
+					<td mat-cell *matCellDef="let item" data-label="LongDescription"> {{item.LongDescription}}
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="BrandName">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Brand </th>
+					<td mat-cell *matCellDef="let item" data-label="Brand Name">
+						<div>{{ (item.BrandName === null) ? '--' : item.BrandName.BrandName }}</div>
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="TableName">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Size </th>
+					<td mat-cell *matCellDef="let item" data-label="Size"> {{item?.size}}
+						<!-- {{item._source.Size}} -->
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="CurrentPackagePrice">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Current Price </th>
+					<td mat-cell *matCellDef="let item" data-label="Current Price">
+						{{(item.ItemSellingPrices != 'undefined' && item.ItemSellingPrices != null) ? item.ItemSellingPrices.CurrentPackagePrice : '--'}}
+						<!-- {{item._source.Description}} -->
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="cost">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Current Cost </th>
+					<td mat-cell *matCellDef="let item" data-label="Current Cost">
+						{{(item.ItemSellingPrices != 'undefined' && item.ItemSellingPrices != null) ? item.ItemSellingPrices.cost : '--'}}
+						<!-- {{item._source.Count}} -->
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="qty_on_hand">
+					<th mat-header-cell *matHeaderCellDef> Qty. On Hand </th>
+					<td mat-cell *matCellDef="let item" data-label="Qty. On Hand"> {{item.qty_on_hand}}
+						<!-- {{item._source.Count}} -->
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="qty_in_case">
+					<th mat-header-cell *matHeaderCellDef> Qty. in Case </th>
+					<td mat-cell *matCellDef="let item" data-label="Qty. in Case">{{item.qty_in_case}}
+						<!-- {{item._source.Count}} -->
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="profit">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Profit </th>
+					<td mat-cell *matCellDef="let item" data-label="Profit">
+						{{(item.ItemSellingPrices != 'undefined' && item.ItemSellingPrices != null) ? item.ItemSellingPrices.profit :'--'}}
+						<!-- {{item._source.Count}} -->
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="margin">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Margin </th>
+					<td mat-cell *matCellDef="let item" data-label="Margin">
+						{{(item.ItemSellingPrices != 'undefined' && item.ItemSellingPrices != null) ? item.ItemSellingPrices.margin :'--'}}
+						<!-- {{item._source.Count}} -->
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="ItemSellingRule">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Selling Rule Name</th>
+					<td mat-cell *matCellDef="let item" data-label="Margin">
+						{{(item.ItemSellingRule != 'undefined' && item.ItemSellingRule != null) ? item.ItemSellingRule.SellingRuleName :'--'}}
+						<!-- {{item._source.Count}} -->
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="ManufacturerSaleUnitRecommendedRetailPriceAmount">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Msrp </th>
+					<td mat-cell *matCellDef="let item" data-label="Msrp">
+						{{(item.ItemSellingPrices != 'undefined' && item.ItemSellingPrices != null) ? item.ItemSellingPrices.ManufacturerSaleUnitRecommendedRetailPriceAmount :'--'}}
+						<!-- {{item._source.Count}} -->
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="selling_price_type">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Selling Price Type </th>
+					<td mat-cell *matCellDef="let item" data-label="Selling Price Type">
+						{{(item.ItemSellingPrices != 'undefined' && item.ItemSellingPrices != null) ? item.ItemSellingPrices.selling_price_type :'--'}}
+						<!-- {{item._source.Count}} -->
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="POSDepartment">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Department Name
+					</th>
+					<td mat-cell *matCellDef="let item" data-label="Margin">
+						{{(item.POSDepartment != 'undefined' && item.POSDepartment != null) ? item.POSDepartment.POSDepartmentName :'--'}}
+						<!-- {{item._source.Count}} -->
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="ABV">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> ABV </th>
+					<td mat-cell *matCellDef="let item" data-label="ABV">
+						{{(item.ABV != 'undefined' && item.ABV != null) ? item.ABV :'--'}}
+						<!-- {{item._source.Count}} -->
+					</td>
+				</ng-container>
+
+				<ng-container matColumnDef="KitSetCode">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Kit Set Code </th>
+					<td mat-cell *matCellDef="let item" data-label="KitSetCode"> {{item.KitSetCode}} </td>
+				</ng-container>
+
+				<ng-container matColumnDef="TypeCode">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+					<td mat-cell *matCellDef="let item" data-label="TypeCode"> {{item.TypeCode}} </td>
+				</ng-container>
+
+				<ng-container matColumnDef="TaxExemptCode">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Tax Exempt Code </th>
+					<td mat-cell *matCellDef="let item" data-label="TaxExemptCode"> {{item.TaxExemptCode}} </td>
+				</ng-container>
+
+				<ng-container matColumnDef="UsageCode">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Usage Code </th>
+					<td mat-cell *matCellDef="let item" data-label="UsageCode"> {{item.UsageCode}} </td>
+				</ng-container>
+
+				<ng-container matColumnDef="OrderCollectionCode">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> Order Collection Code </th>
+					<td mat-cell *matCellDef="let item" data-label="OrderCollectionCode">
+						{{item.OrderCollectionCode}} </td>
+				</ng-container>
+				<ng-container matColumnDef="SupplierName">
+					<th mat-header-cell *matHeaderCellDef mat-sort-header> supplier </th>
+					<td mat-cell *matCellDef="let item" data-label="OrderCollectionCode">
+						{{(item.supplier != 'undefined' && item.supplier != null)?item.supplier[0]:''}}
+						<a>
+							{{(item.supplier != 'undefined' && item.supplier != null)?(item.supplier?.length>1)?(item.supplier.length-1)+'more':'':''}}
+						</a>
+					</td>
+				</ng-container>
+				<ng-container *ngFor="let column of functionListForDisplaycol;let i=index;"
+					matColumnDef="{{column.value}}">
+					<th mat-header-cell *matHeaderCellDef>{{column.header_name}}</th>
+					<td mat-cell *matCellDef="let item"> {{item[column.value]}} </td>
+				</ng-container>
+				<tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" [hidden]="isSpinnerLoaderShow">
+				</tr>
+				<tr mat-row *matRowDef="let row; columns: displayedColumns; let i = index;"
+					[ngClass]="{'active': selection.isSelected(row)}" [hidden]="isSpinnerLoaderShow"></tr>
+			</table>
+			<div *ngIf="!dataSource.data.length  && !isSpinnerLoaderShow" class="no-data">
+				<span>No record(s) found.</span>
+			</div>
+		</div>
+		<mat-paginator [pageSizeOptions]="paginationSetup.pageLimitOptions" [pageSize]="paginationSetup.pageLimit"
+			[length]="paginationSetup.totalRecord" [length]="dataSource.filteredData.length" showFirstLastButtons>
+		</mat-paginator>
+	</div>
+	<!-- </mat-tab> -->
+	<!-- </mat-tab-group> -->
+</div>
+<div mat-dialog-actions class="pop-footer">
+	<button mat-flat-button color="primary" cdkFocusInitial (click)="swapView()">{{swapViewBtnText}}</button>
+	<button mat-stroked-button class="ml-auto" cdkFocusInitial (click)="_dialogRef.close()">Cancel</button>
+	<button mat-flat-button color="accent" cdkFocusInitial (click)="saveDetails()"
+		[disabled]="isbtnLoaderShow">{{btnText}}</button>
+</div>

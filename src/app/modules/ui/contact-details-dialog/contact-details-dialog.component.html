@@ -1,0 +1,142 @@
+<form novalidate [formGroup]="addModuleForm" (ngSubmit)="onSubmit()">
+	<div class="pop-heading" mat-dialog-title>{{dialogTitle}}
+		<div class="d-inline-flex">
+			<button mat-icon-button type="button" (click)="_dialogRef.close(false)"><i class="icon-cursor"></i></button>
+		</div>
+	</div>
+	<div mat-dialog-content>
+		<div class="row">
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Contact Purpose</mat-label>
+					<mat-select formControlName="ContactPurposeTypeCode">
+						<mat-option>
+							None
+						</mat-option>
+						<mat-option *ngFor="let value of ContactPurposeTypeCodeList" [value]="value.id">
+							{{value.ContactPurposeTypeCode}}
+						</mat-option>
+					</mat-select>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Email</mat-label>
+					<input matInput formControlName="email">
+					<mat-error *ngIf="(f.email.touched || f.email.dirty || submitted)">
+						<span *ngIf="f.email.errors?.required">Email is required.</span>
+						<span *ngIf="f.email.errors?.pattern">Email is not valid.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Address Line 1</mat-label>
+					<input matInput formControlName="AddressLine1">
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Address Line 2</mat-label>
+					<input matInput formControlName="AddressLine2">
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Address Line 3</mat-label>
+					<input matInput formControlName="AddressLine3">
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Address Line 4</mat-label>
+					<input matInput formControlName="AddressLine4">
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>City</mat-label>
+					<input matInput formControlName="city">
+					<mat-error *ngIf="(f.city.touched || f.city.dirty || submitted)">
+						<span *ngIf="f.city.errors?.required">City is required.</span>
+						<span *ngIf="f.city.errors?.pattern">City is not valid.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>State</mat-label>
+					<input matInput formControlName="state">
+					<mat-error *ngIf="(f.state.touched || f.state.dirty || submitted)">
+						<span *ngIf="f.state.errors?.required">State is required.</span>
+						<span *ngIf="f.state.errors?.pattern">State is not valid.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Country</mat-label>
+					<mat-select formControlName="country_code">
+						<mat-option>
+							None
+						</mat-option>
+						<mat-option *ngFor="let country of countryList" [value]="country.id">
+							{{country.ITUCountryName}}
+						</mat-option>
+					</mat-select>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Zipcode</mat-label>
+					<input matInput formControlName="zipcode">
+					<mat-error *ngIf="(f.zipcode.touched || f.zipcode.dirty || submitted)">
+						<span *ngIf="f.zipcode.errors?.required">Zipcode is required.</span>
+						<span *ngIf="f.zipcode.errors?.pattern">Zipcode is not valid.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Contact Method</mat-label>
+					<mat-select formControlName="ContactMethodTypeCode">
+						<mat-option>
+							None
+						</mat-option>
+						<mat-option *ngFor="let value of ContactMethodTypeCodeList" [value]="value.id">
+							{{value.ContactMethodTypeCode}}
+						</mat-option>
+					</mat-select>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Phone</mat-label>
+					<input matInput formControlName="phone">
+					<mat-error *ngIf="(f.phone.touched || f.phone.dirty || submitted)">
+						<span *ngIf="f.phone.errors?.required">Phone is required.</span>
+						<span *ngIf="f.phone.errors?.pattern">Phone is not valid.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<div class="col-sm-12">
+				<mat-form-field appearance="outline">
+					<mat-label>Language</mat-label>
+					<mat-select formControlName="language">
+						<mat-option>
+							None
+						</mat-option>
+						<mat-option *ngFor="let language of languageList" [value]="language.id">
+							{{language.Name}}
+						</mat-option>
+					</mat-select>
+				</mat-form-field>
+			</div>
+		</div>
+	</div>
+	<div mat-dialog-actions class="pop-footer">
+		<button mat-button class="ml-auto" cdkFocusInitial (click)="_dialogRef.close(false)"
+			type="button">Cancel</button>
+		<button mat-flat-button color="accent" cdkFocusInitial>Save</button>
+	</div>
+</form>

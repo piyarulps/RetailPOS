@@ -1,0 +1,402 @@
+<div class="">
+	<app-header-sidebar [pageData]="pageData" (getCommonData)="getCommonData($event)"></app-header-sidebar>
+	<section class="wraper" [ngClass]="{'open-nav': isNavOpen}">
+		<div class="table-wraper">
+			<div class="table-action">
+				<!-- <span class="view-text">{{this.selectedList.length}} Items Selected</span>
+				<button color="primary" mat-flat-button class="d-none d-md-block" (click)="edit()">
+					<i class="icon-pencil mr-2"></i>
+					Edit</button>
+				<button mat-icon-button class="d-md-none" (click)="edit()"><i class="icon-pencil"></i></button>
+				<button color="green" mat-flat-button class="d-none d-md-block" (click)="status(1)">
+					<i class="icon-unlock mr-2"></i>
+					Enable</button>
+				<button mat-icon-button class="d-md-none" (click)="status(1)"><i class="icon-unlock"></i></button>
+				<button color="gray" mat-flat-button class="d-none d-md-block" (click)="status(0)">
+					<i class="icon-padlock mr-2"></i>
+					Pause</button>
+				<button mat-icon-button class="d-md-none" (click)="status(0)"><i class="icon-padlock"></i></button>
+				<button color="accent" mat-flat-button class="d-none d-md-block" (click)="delete()">
+					<i class="icon-rubbish-bin mr-2"></i>
+					Delete</button>
+				<button mat-icon-button class="d-md-none" (click)="delete()"><i class="icon-rubbish-bin"></i></button> -->
+
+				<div class="row align-items-center">
+					<div class="col order-2 order-md-1 d-flex">
+						<button color="primary" mat-flat-button class="d-none d-lg-block"
+							(click)="headerSidebarComponent.add()"><i class="icon-plus mr-2"></i> Add New</button>
+						<button mat-flat-button class="d-lg-none btn-box" (click)="headerSidebarComponent.add()"><i
+								class="icon-plus"></i></button>
+
+						<button color="accent" *ngIf="this.selectedList.length" mat-flat-button
+							class="d-none d-lg-block" (click)="delete()"><i class="icon-rubbish-bin mr-2"></i>
+							Delete</button>
+						<button *ngIf="this.selectedList.length" mat-flat-button class="d-lg-none btn-box"
+							(click)="delete()"><i class="icon-rubbish-bin"></i></button>
+
+						<button color="accent" *ngIf="this.selectedList.length" mat-flat-button
+							class="d-none d-lg-block" (click)="status(1)"><i class="icon-unlock1 mr-2"></i>
+							Enable</button>
+						<button *ngIf="this.selectedList.length" mat-flat-button class="d-lg-none btn-box"
+							(click)="status(1)"><i class="icon-unlock1"></i></button>
+
+						<button color="accent" *ngIf="this.selectedList.length" mat-flat-button
+							class="d-none d-lg-block" (click)="status(0)"><i class="icon-padlock mr-2"></i>
+							Disable</button>
+						<button *ngIf="this.selectedList.length" mat-flat-button class="d-lg-none btn-box"
+							(click)="status(0)"><i class="icon-padlock"></i></button>
+					</div>
+					<!-- <div class="col-12 col-md-auto ml-auto order-1 order-md-2">
+							<div class="search-box">
+								<i class="icon-searching"></i>
+								<input type="text" placeholder="Search for...">
+							</div>
+						</div> -->
+					<div class="col-auto ml-auto order-2 order-md-3 d-flex">
+						<button color="accent" mat-stroked-button class="d-none d-lg-block"
+							(click)="headerSidebarComponent.toggleFilter()"><i class="icon-funnel mr-2"></i>
+							Filter</button>
+						<button mat-stroked-button class="d-lg-none btn-box"
+							(click)="headerSidebarComponent.toggleFilter()"><i class="icon-funnel"></i></button>
+
+						<button color="accent" mat-stroked-button class="d-none d-lg-block"
+							(click)="headerSidebarComponent.toggleColumns()"><i class="icon-list mr-2"></i>
+							Column</button>
+						<button mat-stroked-button class="d-lg-none btn-box"
+							(click)="headerSidebarComponent.toggleColumns()"><i class="icon-list"></i></button>
+					</div>
+				</div>
+			</div>
+			<div class="filter-box" [ngClass]="{'active':  filterData.openFilter}">
+				<app-filter class="app-filter" [pageData]="filterData" (getCommonData)="getCommonData($event)">
+				</app-filter>
+			</div>
+			<mat-progress-bar [hidden]="!isLoading" mode="indeterminate" color="accent">
+			</mat-progress-bar>
+
+			<div class="table-list">
+				<table mat-table [dataSource]="dataSource" class="mat-elevation-z8 disable-text-selection" matSort
+					(matSortChange)="sortData($event)">
+					<ng-container matColumnDef="select">
+						<th mat-header-cell *matHeaderCellDef class="check-box" [hidden]="true">
+							<mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+								[checked]="selection.hasValue() && isAllSelected()"
+								[indeterminate]="selection.hasValue() && !isAllSelected()"
+								[aria-label]="checkboxLabel()" #masterCheckbox>
+							</mat-checkbox>
+						</th>
+						<td mat-cell *matCellDef="let row" class="check-box" [hidden]="true">
+							<mat-checkbox color="primary" (click)="$event.stopPropagation()"
+								(change)="$event ? setSelect(row) : null" [checked]="selection.isSelected(row)"
+								[aria-label]="checkboxLabel(row)">
+							</mat-checkbox>
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="VendorStatus">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+						<td mat-cell *matCellDef="let element" data-label="Status" class="state-box">
+							<div
+								[ngClass]="{'active': element.PartyData.ACTIVESTATUS == 'n', 'block': element.PartyData.ACTIVESTATUS == 'y'}">
+							</div>
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="Party">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Party Type </th>
+						<td mat-cell *matCellDef="let element" data-label="Party"> {{element.PartyData.PartyType}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="LegalOrganizationTypeCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Legal Organization Type </th>
+						<td mat-cell *matCellDef="let element" data-label="Legal Organization Type">
+							{{element.PartyData.DisplayLegalOrganizationTypeCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="GlobalBusinessSizeTypeCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Global Business Size Type </th>
+						<td mat-cell *matCellDef="let element" data-label="Global Business Size Type">
+							{{element.PartyData.DisplayGlobalBusinessSizeTypeCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="LegalStatusCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Legal Status Code </th>
+						<td mat-cell *matCellDef="let element" data-label="Legal Status Code">
+							{{element.PartyData.LegalStatusCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="BusinessActivityCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Business Activity Code </th>
+						<td mat-cell *matCellDef="let element" data-label="Business Activity Code">
+							{{element.PartyData.DisplayBusinessActivityCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="LegalName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Legal Name </th>
+						<td mat-cell *matCellDef="let element" data-label="Legal Name"> {{element.PartyData.LegalName}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="TradeName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Trade Name </th>
+						<td mat-cell *matCellDef="let element" data-label="Trade Name"> {{element.PartyData.TradeName}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="ActualOrgDescription">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Organization Description </th>
+						<td mat-cell *matCellDef="let element" data-label="Organization Description">
+							{{element.PartyData.ActualOrgDescription}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="DUNSNumber">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> DUNS Number </th>
+						<td mat-cell *matCellDef="let element" data-label="DUNS Number">
+							{{element.PartyData.DUNSNumber}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="EmployeeCountLocal">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Employee Count (Local) </th>
+						<td mat-cell *matCellDef="let element" data-label="Employee Count (Local)">
+							{{element.PartyData.EmployeeCountLocal}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="EmployeeCountGlobal">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Employee Count (Global) </th>
+						<td mat-cell *matCellDef="let element" data-label="Employee Count (Global)">
+							{{element.PartyData.EmployeeCountGlobal}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="FiscalYearEndDate">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Fiscal Year End Date </th>
+						<td mat-cell *matCellDef="let element" data-label="Fiscal Year End Date">
+							{{element.PartyData.FiscalYearEndDate}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="LocalAnnualRevenueAmount">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Local Annual Revenue Amount </th>
+						<td mat-cell *matCellDef="let element" data-label="LocalAnnualRevenueAmount">
+							{{element.PartyData.LocalAnnualRevenueAmount}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="GlobalAnnualRevenueAmount">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Global Annual Revenue Amount </th>
+						<td mat-cell *matCellDef="let element" data-label="Global Annual Revenue Amount">
+							{{element.PartyData.GlobalAnnualRevenueAmount}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="OpenForBusinessDate">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Open For Business Date </th>
+						<td mat-cell *matCellDef="let element" data-label="Open For Business Date">
+							{{element.PartyData.OpenForBusinessDate}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="ClosedForBusinessDate">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Closed For Business Date </th>
+						<td mat-cell *matCellDef="let element" data-label="Closed For Business Date">
+							{{element.PartyData.ClosedForBusinessDate}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="BankruptcyFlag">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Bankruptcy Flag </th>
+						<td mat-cell *matCellDef="let element" data-label="Bankruptcy Flag">
+							{{element.PartyData.BankruptcyFlag}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="BankruptcyDate">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Bankruptcy Date </th>
+						<td mat-cell *matCellDef="let element" data-label="Bankruptcy Date">
+							{{element.PartyData.BankruptcyDate}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="BankruptcyEmergenceDate">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Bankruptcy Emergence Date </th>
+						<td mat-cell *matCellDef="let element" data-label="Bankruptcy Emergence Date">
+							{{element.PartyData.BankruptcyEmergenceDate}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="BankruptcyTypeCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Bankruptcy Type </th>
+						<td mat-cell *matCellDef="let element" data-label="Bankruptcy Type">
+							{{element.PartyData.BankruptcyTypeCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="LifestyleTypeCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Lifestyle Type </th>
+						<td mat-cell *matCellDef="let element" data-label="Lifestyle Type">
+							{{element.PartyData.DisplayLifestyleTypeCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="EthnicityTypeCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Ethnicity Type </th>
+						<td mat-cell *matCellDef="let element" data-label="Ethnicity Type">
+							{{element.PartyData.DisplayEthnicityTypeCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="EducationLevelCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Education Level </th>
+						<td mat-cell *matCellDef="let element" data-label="Education Level">
+							{{element.PartyData.DisplayEducationLevelCode}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="DietaryHabitTypeCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Dietary Habit Type </th>
+						<td mat-cell *matCellDef="let element" data-label=" Dietary Habit Type">
+							{{element.PartyData.DisplayDietaryHabitTypeCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="DisabilityImpairmentTypeCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Disability Impairment Type </th>
+						<td mat-cell *matCellDef="let element" data-label="Disability Impairment Type">
+							{{element.PartyData.DisplayDisabilityImpairmentTypeCode}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="LifeStageCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Life Stage </th>
+						<td mat-cell *matCellDef="let element" data-label="Life Stage">
+							{{element.PartyData.DisplayLifeStageCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="RaceCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Race Code </th>
+						<td mat-cell *matCellDef="let element" data-label="Race Code">
+							{{element.PartyData.DisplayRaceCode}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="PersonalityTypeCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Personality Type </th>
+						<td mat-cell *matCellDef="let element" data-label="Personality Type">
+							{{element.PartyData.DisplayPersonalityTypeCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="PersonalValueTypeCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Personal Value Type </th>
+						<td mat-cell *matCellDef="let element" data-label="Personal Value Type">
+							{{element.PartyData.DisplayPersonalValueTypeCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="AnnualIncomeRangeCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Annual Income Range </th>
+						<td mat-cell *matCellDef="let element" data-label="Annual Income Range">
+							{{element.PartyData.DisplayAnnualIncomeRangeCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="OccupationTypeCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Occupation Type </th>
+						<td mat-cell *matCellDef="let element" data-label="Occupation Type">
+							{{element.PartyData.DisplayOccupationTypeCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="MaritalStatusCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Marital Status </th>
+						<td mat-cell *matCellDef="let element" data-label="Marital Status">
+							{{element.PartyData.DisplayMaritalStatusCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="EmploymentStatusCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Employment Status </th>
+						<td mat-cell *matCellDef="let element" data-label="Employment Status">
+							{{element.PartyData.DisplayEmploymentStatusCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="Salutation">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Salutation </th>
+						<td mat-cell *matCellDef="let element" data-label="Salutation"> {{element.PartyData.Salutation}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="FirstName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> First Name </th>
+						<td mat-cell *matCellDef="let element" data-label="First Name"> {{element.PartyData.FirstName}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="MiddleNames">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Middle Name </th>
+						<td mat-cell *matCellDef="let element" data-label="Middle Name">
+							{{element.PartyData.MiddleNames}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="LastName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Last Name </th>
+						<td mat-cell *matCellDef="let element" data-label="LastName"> {{element.PartyData.LastName}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="SortingName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Sorting Name </th>
+						<td mat-cell *matCellDef="let element" data-label="Sorting Name">
+							{{element.PartyData.SortingName}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="GenderTypeCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Gender </th>
+						<td mat-cell *matCellDef="let element" data-label="Gender"> {{element.PartyData.GenderTypeCode}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="DateOfBirth">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Date Of Birth </th>
+						<td mat-cell *matCellDef="let element" data-label="Date Of Birth">
+							{{element.PartyData.DateOfBirth}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="Suffix">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Suffix </th>
+						<td mat-cell *matCellDef="let element" data-label="Suffix"> {{element.PartyData.Suffix}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="MailingName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Mailing Name </th>
+						<td mat-cell *matCellDef="let element" data-label="Mailing Name">
+							{{element.PartyData.MailingName}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="OfficialName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Official Name </th>
+						<td mat-cell *matCellDef="let element" data-label="Official Name">
+							{{element.PartyData.OfficialName}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="ConsumerCreditScore">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Consumer Credit Score </th>
+						<td mat-cell *matCellDef="let element" data-label="Consumer Credit Score">
+							{{element.PartyData.ConsumerCreditScore}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="ConsumerCreditRatingServiceName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Consumer Credit Rating Service Name </th>
+						<td mat-cell *matCellDef="let element" data-label="Consumer Credit Rating Service Name">
+							{{element.PartyData.ConsumerCreditRatingServiceName}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="ReligionName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Religion Name </th>
+						<td mat-cell *matCellDef="let element" data-label="Religion Name">
+							{{element.PartyData.DisplayReligionName}} </td>
+					</ng-container>
+
+					<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+					<tr mat-row *matRowDef="let row; columns: displayedColumns; let i = index;"
+						[ngClass]="{'active': selection.isSelected(row)}" (click)="setSelectClick(row, $event)"
+						(mousedown)="setSelectMD(i)" (mouseup)="setSelectMU(i)"></tr>
+				</table>
+				<div *ngIf="!dataSource.data.length && !isLoading" class="no-data text-center">
+					<a href="javascript:void(0)">CLICK HERE</a> to add a {{displayModuleName}}
+				</div>
+				<mat-paginator [hidden]="!dataSource.data.length" [pageSizeOptions]="paginationSetup.pageLimitOptions"
+					[pageSize]="paginationSetup.pageLimit" [length]="paginationSetup.totalRecord" showFirstLastButtons>
+				</mat-paginator>
+			</div>
+		</div>
+		<div class="edit-view" [ngClass]="{'active': openSidebar}">
+			<app-vendors-manage [pageData]="editData" (getCommonData)="getCommonData($event)"></app-vendors-manage>
+		</div>
+	</section>
+
+</div>

@@ -1,0 +1,145 @@
+<form [formGroup]="myForm" (ngSubmit)="doManage()">
+	<div class="pop-heading" mat-dialog-title>{{dialogTitle}}
+		<div class="d-inline-flex">
+			<button type="button" mat-icon-button (click)="_dialogRef.close(false)"><i class="icon-cursor"></i></button>
+		</div>
+	</div>
+	<div mat-dialog-content>
+		<div class="row">
+			<div class="col-md-6 col-lg-6">
+				<!-- <mat-form-field appearance="outline">
+					<mat-label>Price Type</mat-label>
+					<input matInput formControlName="selling_price_type">
+				</mat-form-field> -->
+				<mat-form-field appearance="outline">
+					<mat-label>Price Type</mat-label>
+					<mat-select formControlName="selling_price_type">
+						<mat-option>
+							None
+						</mat-option>
+						<mat-option [value]="1">
+							Regular Price
+						</mat-option>
+					</mat-select>
+					<mat-error *ngIf="f.selling_price_type.errors?.required">
+						<span>Price Type is required.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Price ($)</mat-label>
+					<input matInput currencyMask formControlName="price" currencyMask
+						(keyup)="calculateprofitmargin($event)" [(ngModel)]="item_price"
+						[options]="{ prefix: '', thousands: ',', decimal: '.' }">
+					<mat-error *ngIf="f.price.errors?.isInvalid">
+						<span>Price should be greater than cost.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Cost ($)</mat-label>
+					<input matInput formControlName="cost" currencyMask (keyup)="calculateprofitmargin($event)"
+						[(ngModel)]="item_cost" [options]="{ prefix: '', thousands: ',', decimal: '.' }">
+					<mat-error *ngIf="f.cost.errors?.pattern">
+						<span>Enter valid cost amount.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Margin (%)</mat-label>
+					<input matInput formControlName="margin" currencyMask (keyup)="calculateAspermargin($event)"
+						[(ngModel)]="item_margin" [options]="{ prefix: '', thousands: ',', decimal: '.' }">
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Markup (%)</mat-label>
+					<input matInput formControlName="markup" currencyMask (keyup)="calculateAsperMarkup($event)"
+						[(ngModel)]="item_markup" [options]="{ prefix: '', thousands: ',', decimal: '.' }">
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Profit ($)</mat-label>
+					<input matInput formControlName="profit" currencyMask [(ngModel)]="item_Profit"
+						[options]="{ prefix: '', thousands: ',', decimal: '.' }">
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Begin date</mat-label>
+					<input matInput formControlName="begin_date" [matDatepicker]="picker_begin_date"
+						(focus)="_openCalendar(picker_begin_date)" (click)="_openCalendar(picker_begin_date)">
+					<mat-datepicker #picker_begin_date></mat-datepicker>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>End date</mat-label>
+					<input matInput formControlName="end_date" [matDatepicker]="picker_end_date"
+						(focus)="_openCalendar(picker_end_date)" (click)="_openCalendar(picker_end_date)">
+					<mat-datepicker #picker_end_date></mat-datepicker>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>MSRP ($)</mat-label>
+					<input matInput currencyMask formControlName="msrp"
+						[options]="{ prefix: '', thousands: ',', decimal: '.' }">
+					<mat-error *ngIf="f.msrp.errors?.pattern">
+						<span>Enter valid MSRP.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>MSRP date</mat-label>
+					<input matInput formControlName="msrp_date" [matDatepicker]="picker_msrp_date"
+						(focus)="_openCalendar(picker_msrp_date)" (click)="_openCalendar(picker_msrp_date)">
+					<mat-datepicker #picker_msrp_date></mat-datepicker>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Compare At Sale Unit price</mat-label>
+					<input matInput formControlName="compare_at_sale_unit_price">
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Current Sale Unit Return Price</mat-label>
+					<input matInput formControlName="CurrentSaleUnitReturnPrice">
+					<mat-error *ngIf="f.CurrentSaleUnitReturnPrice.errors?.pattern">
+						<span>Enter valid price.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Minimum Retail Unit Price</mat-label>
+					<input matInput formControlName="MinimumAdvertisedRetailUnitPrice">
+					<mat-error *ngIf="f.MinimumAdvertisedRetailUnitPrice.errors?.pattern">
+						<span>Enter valid price.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Minimum Retail Unit Price Effective Date</mat-label>
+					<input matInput formControlName="MinimumAdvertisedRetailUnitPriceEffectiveDate"
+						[matDatepicker]="picker_msrped_date" (focus)="_openCalendar(picker_msrped_date)"
+						(click)="_openCalendar(picker_msrped_date)">
+					<mat-datepicker #picker_msrped_date></mat-datepicker>
+				</mat-form-field>
+			</div>
+		</div>
+	</div>
+	<div mat-dialog-actions class="pop-footer">
+		<button mat-stroked-button class="ml-auto" cdkFocusInitial (click)="_dialogRef.close(false)">Cancel</button>
+		<button mat-flat-button color="accent" cdkFocusInitial *ngIf="!editData.length">{{btnCreateTxt}}</button>
+		<button mat-flat-button color="accent" cdkFocusInitial *ngIf="editData.length">{{btnUpdateTxt}}</button>
+	</div>
+</form>

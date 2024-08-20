@@ -1,0 +1,32 @@
+<div>
+	<form [formGroup]="myForm" (ngSubmit)="doManage()">
+		<div class="edit-view-heading">{{dialogTitle}}</div>
+		<div class="edit-view-body">
+			<mat-form-field appearance="outline">
+				<mat-label>Group Name</mat-label>
+				<input matInput placeholder="Group Name" formControlName="description" #groupNameInput="matInput">
+				<mat-error *ngIf="(f.description.touched || f.description.dirty || submitted)">
+					<span *ngIf="f.description.errors?.required">Select value for
+						Group Name.</span>
+				</mat-error>
+			</mat-form-field>
+		</div>
+		<div class="edit-view-heading">
+			Condition
+			<i class="icon-pencil ml-auto" (click)="manageGroupItem()"></i>
+		</div>
+		<div class="edit-view-body">
+			<p [innerHtml]="showConditionsData"></p>
+			<!-- <p>Description Is Equal To Marlboro Blend <span class="font-weight-bold">AND</span> Brand Is Equal
+          To Marlboro <span class="font-weight-bold">AND</span> Size Is Equal To Pack</p> -->
+		</div>
+		<div class="edit-view-footer">
+			<button type="button" mat-button color="accent" cdkFocusInitial class="ml-auto"
+				(click)="onNoClick()">Cancel</button>
+			<button mat-flat-button color="accent" cdkFocusInitial *ngIf="GroupItemID == null"
+				[disabled]="isbtnLoaderShow">{{btnCreateTxt}}</button>
+			<button mat-flat-button color="accent" cdkFocusInitial *ngIf="GroupItemID != null"
+				[disabled]="isbtnLoaderShow">{{btnUpdateTxt}}</button>
+		</div>
+	</form>
+</div>

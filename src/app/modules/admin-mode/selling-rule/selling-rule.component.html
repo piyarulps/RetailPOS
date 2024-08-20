@@ -1,0 +1,360 @@
+<div class="">
+  <app-header-sidebar [pageData]="pageData" (getCommonData)="getCommonData($event)"></app-header-sidebar>
+  <section class="wraper" [ngClass]="{'open-nav': isNavOpen}">
+    <div class="table-wraper">
+      <div class="table-action">
+        <div class="row align-items-center">
+          <div class="col order-2 order-md-1 d-flex">
+            <button color="primary" mat-flat-button class="d-none d-lg-block" (click)="headerSidebarComponent.add()"><i
+                class="icon-plus mr-2"></i> Add New</button>
+            <button mat-flat-button class="d-lg-none btn-box" (click)="headerSidebarComponent.add()"><i
+                class="icon-plus"></i></button>
+
+            <button color="accent" *ngIf="this.selectedList.length" mat-stroked-button class="d-none d-lg-block"
+              (click)="delete()"><i class="icon-rubbish-bin mr-2"></i> Delete</button>
+            <button *ngIf="this.selectedList.length" mat-stroked-button class="d-lg-none btn-box" (click)="delete()"><i
+                class="icon-rubbish-bin"></i></button>
+
+            <button color="accent" *ngIf="this.selectedList.length" mat-stroked-button class="d-none d-lg-block"
+              (click)="status(1)"><i class="icon-unlock1 mr-2"></i> Enable</button>
+            <button *ngIf="this.selectedList.length" mat-stroked-button class="d-lg-none btn-box" (click)="status(1)"><i
+                class="icon-unlock1"></i></button>
+
+            <button color="accent" *ngIf="this.selectedList.length" mat-stroked-button class="d-none d-lg-block"
+              (click)="status(0)"><i class="icon-padlock mr-2"></i> Pause</button>
+            <button *ngIf="this.selectedList.length" mat-stroked-button class="d-lg-none btn-box" (click)="status(0)"><i
+                class="icon-padlock"></i></button>
+          </div>
+          <!-- <div class="col-12 col-md-auto ml-auto order-1 order-md-2">
+            <div class="search-box">
+              <i class="icon-searching"></i>
+              <input type="text" placeholder="Search for...">
+            </div>
+          </div> -->
+          <div class="col-auto ml-auto order-2 order-md-3 d-flex">
+            <button color="accent" mat-stroked-button class="d-none d-lg-block"
+              (click)="headerSidebarComponent.toggleFilter()"><i class="icon-funnel mr-2"></i>
+              Filter</button>
+            <button mat-stroked-button class="d-lg-none btn-box" (click)="headerSidebarComponent.toggleFilter()"><i
+                class="icon-funnel"></i></button>
+
+            <button color="accent" mat-stroked-button class="d-none d-lg-block"
+              (click)="headerSidebarComponent.toggleColumns()"><i class="icon-list mr-2"></i>
+              Column</button>
+            <button mat-stroked-button class="d-lg-none btn-box" (click)="headerSidebarComponent.toggleColumns()"><i
+                class="icon-list"></i></button>
+          </div>
+        </div>
+      </div>
+      <div class="filter-box" [ngClass]="{'active':  filterData.openFilter}">
+        <app-filter class="app-filter" [pageData]="filterData" (getCommonData)="getCommonData($event)">
+        </app-filter>
+      </div>
+      <mat-progress-bar [hidden]="!isLoading" mode="indeterminate" color="accent">
+      </mat-progress-bar>
+
+      <div class="table-list">
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 disable-text-selection" matSort
+          (matSortChange)="sortData($event)">
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef class="check-box" [hidden]="true">
+              <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+                [checked]="selection.hasValue() && isAllSelected()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()"
+                #masterCheckbox>
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row" class="check-box" [hidden]="true">
+              <mat-checkbox color="primary" (click)="$event.stopPropagation()" (change)="$event ? setSelect(row) : null"
+                [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+            <td mat-cell *matCellDef="let element" data-label="Status">
+              <div class="stat-box" [ngClass]="{'active': element.status == 1, 'block': element.status == 0}">
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+            <td mat-cell *matCellDef="let element" data-label="Name"> {{element.name}} </td>
+          </ng-container>
+
+          <ng-container matColumnDef="Description">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Descripition </th>
+            <td mat-cell *matCellDef="let element" data-label="Description"> {{element.description}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="SellingStatusCode">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Process Mode</th>
+            <td mat-cell *matCellDef="let element" data-label="Process Mode">
+              {{element.processMode}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="QuantityKeyActionCode">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Quantity Key Action Mode</th>
+            <td mat-cell *matCellDef="let element" data-label="Quantity Key Action Mode">
+              {{element.quantityKeyActionMode}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="EmployeeDiscountAllowedFlag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Allow Employee Discount </th>
+            <td mat-cell *matCellDef="let element" data-label=" Allow Employee Discount">
+              {{element.allowEmployeeDiscount === 1 ? 'Yes' : 'No'}}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="AllowFoodStampFlag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Allow Food Stamp </th>
+            <td mat-cell *matCellDef="let element" data-label="Allow Food Stamp">
+              {{element.allowFoodStamp === 1 ? 'Yes' : 'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="GiveawayFlag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Allow Give Away</th>
+            <td mat-cell *matCellDef="let element" data-label="Allow Give Away">
+              {{element.allowGiveAway === 1 ? 'Yes' : 'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="WICFlag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Allow WIC</th>
+            <td mat-cell *matCellDef="let element" data-label="Allow WIC">
+              {{element.allowWIC === 1 ? 'Yes' : 'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="AllowCouponMultiplyFlag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Allow Multiple Coupon</th>
+            <td mat-cell *matCellDef="let element" data-label="Allow Multiple Coupon">
+              {{element.allowMultipleCoupon === 1 ? 'Yes' : 'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="CouponRestrictedFlag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Coupon Restricted</th>
+            <td mat-cell *matCellDef="let element" data-label="Coupon Restricted">
+              {{element.couponRestricted === 1 ? 'Yes' : 'No'}}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="ElectronicCouponFlag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Electronics Coupons</th>
+            <td mat-cell *matCellDef="let element" data-label="Electronics Coupons">
+              {{element.electronicsCoupon==1 ? 'Yes':'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="FrequentShopperPointsEligibilityFlag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Frequent Shopper Point Eligible</th>
+            <td mat-cell *matCellDef="let element" data-label="Frequent Shopper Point Eligible">
+              {{element.frequentShopperPointEligible === 1 ? 'Yes' : 'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="FrequentShopperPointsCount">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Frequent Shopper Point Count</th>
+            <td mat-cell *matCellDef="let element" data-label="Frequent Shopper Point Count">
+              {{element.frequentShopperPointCount}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="VisualVerifyPriceFlag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Must Verify Price</th>
+            <td mat-cell *matCellDef="let element" data-label="Must Verify Price">
+              {{element.mustVerifyPrice === 1 ? 'Yes' : 'No'}}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="ProhibitRepeatKeyFlag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Repeat Key Prohibited</th>
+            <td mat-cell *matCellDef="let element" data-label="Repeat Key Prohibited">
+              {{element.repeatKeyProhibited === 1 ? 'Yes' : 'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="PriceEntryRequiredFlag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Requires Price Entry</th>
+            <td mat-cell *matCellDef="let element" data-label="Requires Price Entry">
+              {{element.requiresPriceEntry === 1 ? 'Yes' : 'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="WeightEntryRequiredFlag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Requires Weight Entry</th>
+            <td mat-cell *matCellDef="let element" data-label="Requires Weight Entry">
+              {{element.requiresWeightEntry === 1 ? 'Yes' : 'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="ProhibitReturnFlag">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Return Prohibited</th>
+            <td mat-cell *matCellDef="let element" data-label="Return Prohibited">
+              {{element.returnProhibited === 1 ? 'Yes' : 'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="ItemSellingRule">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Item Tender Resctiction Group Code</th>
+            <td mat-cell *matCellDef="let element" data-label="Item Tender Resctiction Group Code">
+              {{element.itemTenderRestrictionGroupName}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="MaxAmount">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Passport Max Amount</th>
+            <td mat-cell *matCellDef="let element" data-label="Passport Max Amount">
+              {{element.passMaxAmount}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="ModifierQuantity">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Passport Modifier Quantity</th>
+            <td mat-cell *matCellDef="let element" data-label="Passport Modifier Quantity">
+              {{element.passModifierQuantity}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Open">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Passport Open</th>
+            <td mat-cell *matCellDef="let element" data-label="Passport Open">
+              {{element.passOpen}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="FoodStamp">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Passport Food Stamp</th>
+            <td mat-cell *matCellDef="let element" data-label="Passport Food Stamp">
+              {{element.passFoodStamp}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Discount">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Passport Discount</th>
+            <td mat-cell *matCellDef="let element" data-label="Passport Discount">
+              {{element.passDiscount}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="QuantityNotAllowed">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Passport Quantity Not Allow</th>
+            <td mat-cell *matCellDef="let element" data-label="Passport Quantity Not Allow">
+              {{element.passQuantityNotAllow}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="QuantityRequired">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Passport Quantity Required</th>
+            <td mat-cell *matCellDef="let element" data-label="Passport Quantity Required">
+              {{element.passQuantityRequired}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="MayNotBeSold">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>May Not Be Sold(Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="May Not Be Sold(Sapphire)">
+              {{element.sappMayNotBeSold==1 ? 'Yes':'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="IsNotReturnable">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Is Not Returnable(Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Is Not Returnable(Sapphire)">
+              {{element.sappIsNotReturnable==1 ? 'Yes':'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Tax1">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Tax1(Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Tax1(Sapphire)">
+              {{element.sappTax1}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Tax2">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Tax2(Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Tax2(Sapphire)">
+              {{element.sappTax2}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Tax3">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Tax3(Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Tax3(Sapphire)">
+              {{element.sappTax3}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="Tax4">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Tax4(Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Tax4(Sapphire)">
+              {{element.sappTax4}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="CheckId1">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>CheckId1(Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="CheckId1(Sapphire)">
+              {{element.sappCheckId1}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="CheckId2">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>CheckId2(Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="CheckId2(Sapphire)">
+              {{element.sappCheckId2}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="FractionalQuantity">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Fractional Quantity(Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Fractional Quantity(Sapphire)">
+              {{element.sappFractionalQuantity}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="OpenSappire">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Open (Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Open (Sapphire)">
+              {{element.sappOpen}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="SpecialDiscountAllowed">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Special Discount Allow (Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Special Discount Allow (Sapphire)">
+              {{element.sappSpecialDiscountAllowed}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="BlueLaw1Applies">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Blue Law1 Applies (Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Blue Law1 Applies (Sapphire)">
+              {{element.sappBlueLaw1Applies==1 ? 'Yes':'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="BlueLaw2Applies">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Blue Law2 Applies (Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Blue Law2 Applies (Sapphire)">
+              {{element.sappBlueLaw2Applies==1 ? 'Yes':'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="DepartmentSpecialDiscount">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Department Special Discount(Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Department Special Discount(Sapphire)">
+              {{element.sappDepartmentSpecialDiscount}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="LottoTracking">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Lotto Tracking(Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Lotto Tracking(Sapphire)">
+              {{element.sappLottoTracking}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="ModifyItem">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Modify Item(Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Modify Item(Sapphire)">
+              {{element.sappModifyItem==1 ? 'Yes':'No'}}
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="ItemNotCatchedOnPOS">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Item Not Cached On POS(Sapphire)</th>
+            <td mat-cell *matCellDef="let element" data-label="Item Not Cached On POS(Sapphire)">
+              {{element.sappItemNotCachedOnPos==1 ? 'Yes':'No'}}
+            </td>
+          </ng-container>
+
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns; let i = index;"
+            [ngClass]="{'active': selection.isSelected(row)}" (click)="setSelectClick(row, $event)"
+            (mousedown)="setSelectMD(i)" (mouseup)="setSelectMU(i)"></tr>
+        </table>
+        <div *ngIf="!dataSource.data.length && !isLoading" class="no-data text-center">
+          <a href="javascript:void(0)">CLICK HERE</a> to add a {{displayModuleName}}
+        </div>
+        <mat-paginator [hidden]="!dataSource.data.length" [pageSizeOptions]="paginationSetup.pageLimitOptions"
+          [pageSize]="paginationSetup.pageLimit" [length]="paginationSetup.totalRecord" showFirstLastButtons>
+        </mat-paginator>
+      </div>
+    </div>
+    <div class="edit-view" [ngClass]="{'active': openSidebar}">
+      <app-sellingrule-manage [pageData]="editData" (getCommonData)="getCommonData($event)"></app-sellingrule-manage>
+    </div>
+  </section>
+
+</div>

@@ -1,0 +1,128 @@
+<!-- <form [formGroup]="myForm" (ngSubmit)="doManage()">
+	<div class="pop-heading" mat-dialog-title>{{dialogTitle}}
+		<div class="d-inline-flex">
+			<button type="button" mat-icon-button (click)="_dialogRef.close(false)"><i class="icon-cursor"></i></button>
+		</div>
+	</div>
+	<div mat-dialog-content>
+		<div class="row">
+			<div class="col-md-6 col-lg-6" [hidden]="editData.length > 1">
+				<div *ngIf="editData.length && editData.length == 1;else selectbox">
+					<mat-form-field appearance="outline">
+						<mat-label>Name*</mat-label>
+						<input matInput formControlName="TableName">
+					</mat-form-field>
+					<mat-error *ngIf="(f.TableName.touched || f.TableName.dirty || submitted)">
+						<span *ngIf="f.TableName.errors?.required">Size Name is required.</span>
+					</mat-error>
+				</div>
+				<ng-template #selectbox>
+					<ng-select
+						[ngClass]="{'ng-error':(f.TableName.touched || f.TableName.dirty || submitted) && f.TableName.errors?.required}"
+						placeholder="Select value for size name*" [addTag]="addTag" [clearOnBackspace]="true"
+						[dropdownPosition]="'bottom'" [items]="TableNameDropDownList" bindLabel="_source.TableName"
+						bindValue="_source.TableName" [loading]="TableNameLoading" formControlName="TableName"
+						(change)="onSelectTableName($event)" (keyup)="onTableNameSearch($event)" appendTo="body">
+						<ng-template ng-tag-tmp let-search="searchTerm">
+							<b [ngStyle]="{'color': '#0000FF'}">Add new size</b>: {{search}}
+						</ng-template>
+					</ng-select>
+				</ng-template>
+				<mat-error *ngIf="(f.TableName.touched || f.TableName.dirty || submitted)">
+					<span *ngIf="f.TableName.errors?.required">Size Name is required.</span>
+				</mat-error>
+			</div>
+			<div
+				[ngClass]="{'col-md-6': !editData.length || editData.length == 1, 'col-lg-6': !editData.length || editData.length == 1,'col-md-12': editData.length > 1}">
+				<mat-form-field appearance="outline">
+					<mat-label>Size Family</mat-label>
+					<mat-select formControlName="SizeFamily">
+						<mat-option>
+							None
+						</mat-option>
+						<mat-option *ngFor="let sizeFamily of sizeFamilyList" [value]="sizeFamily.id">
+							{{sizeFamily.SizeFamilyName}}
+						</mat-option>
+					</mat-select>
+				</mat-form-field>
+			</div>
+			<div class="col-12">
+				<mat-form-field appearance="outline">
+					<mat-label>Description</mat-label>
+					<textarea rows="1" matInput formControlName="Description"></textarea>
+				</mat-form-field>
+			</div>
+		</div>
+	</div>
+	<div mat-dialog-actions class="pop-footer">
+		<button mat-flat-button color="accent" class="btn-block" cdkFocusInitial
+			*ngIf="!editData.length">{{btnCreateTxt}}</button>
+		<button mat-flat-button color="accent" class="btn-block" cdkFocusInitial
+			*ngIf="editData.length">{{btnUpdateTxt}}</button>
+	</div>
+</form> -->
+
+
+<form [formGroup]="myForm" (ngSubmit)="doManage()" (keyup)="setPreData()">
+	<div class="edit-view-heading">
+		{{dialogTitle}}
+		<!-- <button mat-icon-button (click)="onNoClick()" type="button" class="ml-auto"><i class="icon-cursor"></i></button> -->
+	</div>
+	<div class="edit-view-body">
+		<div [hidden]="editData.length > 1">
+			<div *ngIf="editData.length && editData.length == 1;else selectbox">
+				<mat-form-field appearance="outline">
+					<mat-label>Name*</mat-label>
+					<input matInput formControlName="TableName" #sizeNameInput="matInput">
+				</mat-form-field>
+				<mat-error *ngIf="(f.TableName.touched || f.TableName.dirty || submitted)">
+					<span *ngIf="f.TableName.errors?.required">Size Name is required.</span>
+				</mat-error>
+			</div>
+			<ng-template #selectbox>
+				<div class="ng-select-wrapper">
+					<ng-select
+						[ngClass]="{'ng-error':(f.TableName.touched || f.TableName.dirty || submitted) && f.TableName.errors?.required}"
+						placeholder="Select value for size name*" [addTag]="addTag" [clearOnBackspace]="true"
+						[dropdownPosition]="'bottom'" [items]="TableNameDropDownList" bindLabel="_source.TableName"
+						bindValue="_source.TableName" [loading]="TableNameLoading" formControlName="TableName"
+						(change)="onSelectTableName($event)" (keyup)="onTableNameSearch($event)" appendTo="body"
+						#sizeNameSelect [(ngModel)]="sizeName">
+						<ng-template ng-tag-tmp let-search="searchTerm">
+							<b [ngStyle]="{'color': '#0000FF'}">Add new size</b>: {{search}}
+						</ng-template>
+					</ng-select>
+					<mat-error *ngIf="(f.TableName.touched || f.TableName.dirty || submitted)">
+						<span *ngIf="f.TableName.errors?.required">Size Name is required.</span>
+					</mat-error>
+				</div>
+			</ng-template>
+		</div>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Size Family</mat-label>
+			<mat-select formControlName="SizeFamily">
+				<mat-option>
+					None
+				</mat-option>
+				<mat-option *ngFor="let sizeFamily of sizeFamilyList" [value]="sizeFamily.SizeFamilyName">
+					{{sizeFamily.SizeFamilyName}}
+				</mat-option>
+			</mat-select>
+		</mat-form-field>
+
+		<mat-form-field appearance="outline">
+			<mat-label>Description</mat-label>
+			<textarea rows="1" matInput formControlName="Description"></textarea>
+		</mat-form-field>
+
+	</div>
+	<div class="edit-view-footer">
+		<button type="button" mat-button color="accent" cdkFocusInitial class="ml-auto"
+			(click)="onNoClick()">Cancel</button>
+		<button mat-flat-button color="accent" cdkFocusInitial *ngIf="!editData.length"
+			[disabled]="isbtnLoaderShow">{{btnCreateTxt}}</button>
+		<button mat-flat-button color="accent" cdkFocusInitial *ngIf="editData.length"
+			[disabled]="isbtnLoaderShow">{{btnUpdateTxt}}</button>
+	</div>
+</form>

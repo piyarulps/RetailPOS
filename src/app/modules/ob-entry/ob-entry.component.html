@@ -1,0 +1,49 @@
+<div class="login-container">
+	<div class="log-box">
+		<div class="log-heading">
+			Enter Opening Balance
+		</div>
+		<div class="log-key">
+			<form [formGroup]="myForm" (ngSubmit)="doManage()">
+				<mat-form-field appearance="outline" color="white">
+					<mat-label>Opening Balance ({{_helper.defaultCurrency()}})</mat-label>
+					<!-- <input matInput formControlName="default_balance" currencyMask
+					[options]="{ prefix: '', thousands: ',', decimal: '.' }" #openingBalanceInput> -->
+					<input matInput formControlName="default_balance" #openingBalanceInput class="text-right"
+						(click)="openingBalanceInputField.nativeElement.select()">
+					<mat-error *ngIf="(f.default_balance.touched || f.default_balance.dirty || submitted)">
+						<span *ngIf="f.default_balance.errors?.required">Enter opening balance to continue.</span>
+						<span *ngIf="f.default_balance.errors?.pattern">Enter valid opening balance.</span>
+					</mat-error>
+				</mat-form-field>
+			</form>
+		</div>
+		<ul class="log-num" (mousedown)="ignoreFocus($event)">
+			<li (click)="enterAccessCode('1')">1</li>
+			<li (click)="enterAccessCode('2')">2</li>
+			<li (click)="enterAccessCode('3')">3</li>
+			<li (click)="enterAccessCode('4')">4</li>
+			<li (click)="enterAccessCode('5')">5</li>
+			<li (click)="enterAccessCode('6')">6</li>
+			<li (click)="enterAccessCode('7')">7</li>
+			<li (click)="enterAccessCode('8')">8</li>
+			<li (click)="enterAccessCode('9')">9</li>
+			<li (click)="enterAccessCode('00')">00</li>
+			<li (click)="enterAccessCode('0')">0</li>
+			<li (click)="enterAccessCode('.')">.</li>
+			<li (click)="removeAccessCode()">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24.03" height="18.029" viewBox="0 0 24.03 18.029">
+					<path class="a"
+						d="M416.231,587.515a1,1,0,0,1-.838-.454l-5.244-8.013a1,1,0,0,1,0-1.1l5.244-8.013a1,1,0,0,1,.838-.453h16.783a1,1,0,0,1,1,1v16.025a1,1,0,0,1-1,1Zm-4.047-9.014,4.589,7.011h15.241V571.489H416.773Zm15.116,4.714-3.3-3.3-3.3,3.3a1,1,0,1,1-1.416-1.417l3.3-3.3-3.3-3.3a1,1,0,1,1,1.416-1.417l3.3,3.3,3.3-3.3a1,1,0,0,1,1.416,1.417l-3.3,3.3,3.3,3.3a1,1,0,1,1-1.416,1.417Z"
+						transform="translate(-409.986 -569.486)" /></svg>
+			</li>
+			<li [routerLink]="['/dashboard']">X</li>
+			<li (click)="doManage()" class="active">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24.001" height="17.159" viewBox="0 0 24.001 17.159">
+					<path class="a"
+						d="M613.093,569.328a1.39,1.39,0,0,0-1.966,0l-12.853,13.4-6.4-6.4a1.39,1.39,0,0,0-1.966,1.966l7.385,7.384a1.39,1.39,0,0,0,1.966,0l13.836-14.379A1.39,1.39,0,0,0,613.093,569.328Z"
+						transform="translate(-589.5 -568.921)" /></svg>
+			</li>
+		</ul>
+	</div>
+</div>

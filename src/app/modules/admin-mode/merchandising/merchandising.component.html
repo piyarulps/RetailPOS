@@ -1,0 +1,147 @@
+<div class="">
+	<app-header-sidebar [pageData]="pageData" (getCommonData)="getCommonData($event)"></app-header-sidebar>
+	<section class="wraper" [ngClass]="{'open-nav': isNavOpen}">
+		<div class="table-wraper">
+			<div class="table-action">
+
+				<div class="row align-items-center">
+					<div class="col order-2 order-md-1 d-flex">
+						<button color="primary" mat-flat-button class="d-none d-lg-block"
+							(click)="headerSidebarComponent.add()"><i class="icon-plus mr-2"></i> Add New</button>
+						<button mat-flat-button class="d-lg-none btn-box" (click)="headerSidebarComponent.add()"><i
+								class="icon-plus"></i></button>
+
+						<button color="accent" *ngIf="this.selectedList.length" mat-flat-button
+							class="d-none d-lg-block" (click)="delete()"><i class="icon-rubbish-bin mr-2"></i>
+							Delete</button>
+						<button *ngIf="this.selectedList.length" mat-flat-button class="d-lg-none btn-box"
+							(click)="delete()"><i class="icon-rubbish-bin"></i></button>
+
+						<button color="accent" *ngIf="this.selectedList.length" mat-flat-button
+							class="d-none d-lg-block" (click)="status(1)"><i class="icon-unlock1 mr-2"></i>
+							Enable</button>
+						<button *ngIf="this.selectedList.length" mat-flat-button class="d-lg-none btn-box"
+							(click)="status(1)"><i class="icon-unlock1"></i></button>
+
+						<button color="accent" *ngIf="this.selectedList.length" mat-flat-button
+							class="d-none d-lg-block" (click)="status(0)"><i class="icon-padlock mr-2"></i>
+							Disable</button>
+						<button *ngIf="this.selectedList.length" mat-flat-button class="d-lg-none btn-box"
+							(click)="status(0)"><i class="icon-padlock"></i></button>
+					</div>
+					<!-- <div class="col-12 col-md-auto ml-auto order-1 order-md-2">
+							<div class="search-box">
+								<i class="icon-searching"></i>
+								<input type="text" placeholder="Search for...">
+							</div>
+						</div> -->
+					<div class="col-auto ml-auto order-2 order-md-3 d-flex" *ngIf="false">
+						<button color="accent" mat-stroked-button class="d-none d-lg-block"
+							(click)="headerSidebarComponent.toggleFilter()"><i class="icon-funnel mr-2"></i>
+							Filter</button>
+						<button mat-stroked-button class="d-lg-none btn-box"
+							(click)="headerSidebarComponent.toggleFilter()"><i class="icon-funnel"></i></button>
+
+						<button color="accent" mat-stroked-button class="d-none d-lg-block"
+							(click)="headerSidebarComponent.toggleColumns()"><i class="icon-list mr-2"></i>
+							Column</button>
+						<button mat-stroked-button class="d-lg-none btn-box"
+							(click)="headerSidebarComponent.toggleColumns()"><i class="icon-list"></i></button>
+					</div>
+				</div>
+			</div>
+			<div class="filter-box" [ngClass]="{'active':  filterData.openFilter}">
+				<app-filter class="app-filter" [pageData]="filterData" (getCommonData)="getCommonData($event)">
+				</app-filter>
+			</div>
+			<mat-progress-bar [hidden]="!isLoading" mode="indeterminate" color="accent">
+			</mat-progress-bar>
+
+			<div class="table-list">
+				<table mat-table [dataSource]="dataSource" class="mat-elevation-z8 disable-text-selection" matSort
+					(matSortChange)="sortData($event)">
+					<ng-container matColumnDef="select">
+						<th mat-header-cell *matHeaderCellDef class="check-box" [hidden]="true">
+							<mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+								[checked]="selection.hasValue() && isAllSelected()"
+								[indeterminate]="selection.hasValue() && !isAllSelected()"
+								[aria-label]="checkboxLabel()" #masterCheckbox>
+							</mat-checkbox>
+						</th>
+						<td mat-cell *matCellDef="let row" class="check-box" [hidden]="true">
+							<mat-checkbox color="primary" (click)="$event.stopPropagation(); isRootNodeChk(row,'L');"
+								(change)="$event ? setSelect(row) : null" [checked]="selection.isSelected(row)"
+								[aria-label]="checkboxLabel(row)">
+							</mat-checkbox>
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="ChildMerchandiseHierarchyGroup">
+						<th mat-header-cell *matHeaderCellDef> Group </th>
+						<td mat-cell *matCellDef="let data" data-label="ChildMerchandiseHierarchyGroup">
+							{{data.ChildMerchandiseHierarchyGroup?.hierarchy_group_name}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="ParentMerchandiseHierarchyGroup">
+						<th mat-header-cell *matHeaderCellDef> Parent Group </th>
+						<td mat-cell *matCellDef="let data" data-label="ParentMerchandiseHierarchyGroup">
+							{{data.ParentMerchandiseHierarchyGroup?.hierarchy_group_name}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="description">
+						<th mat-header-cell *matHeaderCellDef> Description </th>
+						<td mat-cell *matCellDef="let data" data-label="Description">
+							{{data.ChildMerchandiseHierarchyGroup?.description}}
+						</td>
+					</ng-container>
+
+					<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+					<tr mat-row *matRowDef="let row; columns: displayedColumns; let i = index;"
+						[ngClass]="{'active': selection.isSelected(row)}" (click)="setSelectClick(row, $event)"
+						(mousedown)="setSelectMD(i)" (mouseup)="setSelectMU(i)"></tr>
+				</table>
+				<div *ngIf="!dataSource.data.length && !isLoading" class="no-data text-center">
+					<a href="javascript:void(0)" (click)="headerSidebarComponent.add()">CLICK HERE</a> to add a
+					{{displayModuleName}}
+				</div>
+				<mat-paginator [hidden]="!dataSource.data.length" [pageSizeOptions]="paginationSetup.pageLimitOptions"
+					[pageSize]="paginationSetup.pageLimit" [length]="paginationSetup.totalRecord" showFirstLastButtons>
+				</mat-paginator>
+			</div>
+		</div>
+		<div class="edit-view list-view" [ngClass]="{'active': !openSidebar}">
+			<div>
+				<div class="edit-view-heading">
+					Merchandising Function
+					<button mat-stroked-button class="btn-box ml-auto"><i class="icon-spanner"></i></button>
+				</div>
+				<div class="edit-view-body">
+					<ul class="gr-list">
+						<li [ngClass]="{'active': MerchandiseFunctionID == MerchandiseFunction.id }"
+							*ngFor="let MerchandiseFunction of MerchandiseFunctionList">
+							<span
+								(click)="getHierarchy(MerchandiseFunction.id)">{{MerchandiseFunction.hierarchy_function_name}}</span>
+							<i class="icon-more" [matMenuTriggerFor]="menu"></i>
+							<mat-menu #menu="matMenu">
+								<button mat-menu-item (click)="editMerchandise(MerchandiseFunction.id)">
+									Edit
+								</button>
+								<button mat-menu-item
+									(click)="deletehierarchyFunction('delete','y',1,MerchandiseFunction.id)">
+									Delete
+								</button>
+							</mat-menu>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="edit-view" [ngClass]="{'active': openSidebar}">
+			<app-merchandise-groups-manage [pageData]="editData" (getCommonData)="getCommonData($event)">
+			</app-merchandise-groups-manage>
+		</div>
+	</section>
+
+</div>

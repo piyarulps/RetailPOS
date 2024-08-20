@@ -1,0 +1,79 @@
+<div class="app-component">
+	<div class="dash-header">
+		<div class="heading-name">Start</div>
+		<div class="user-details">
+			<div class="user-name">
+				<span>Hello</span> {{userName}}
+			</div>
+			<div class="user-icon" [matMenuTriggerFor]="UserMenu">
+				<i class="icon-user"></i>
+			</div>
+			<mat-menu #UserMenu="matMenu" xPosition="before">
+				<button (click)="logout()" mat-menu-item>Logout</button>
+			</mat-menu>
+		</div>
+	</div>
+	<div class="dash-body">
+		<div (click)="enterSaleMode()" matRipple class="dash-box lg-box orange-bg">
+			<ng-container *ngIf="navigatingTo.saleMode; then saleModeLoading else saleModeIcon"></ng-container>
+			<ng-template #saleModeIcon>
+				<i class="icon-cart"></i>
+			</ng-template>
+			<ng-template #saleModeLoading>
+				<mat-progress-spinner [color]="white" [mode]="'indeterminate'" [diameter]="70">
+				</mat-progress-spinner>
+			</ng-template>
+			Sale Mode
+		</div>
+		<div class="sm-box-group">
+			<div matRipple class="dash-box sm-box green-bg">
+				<ng-container *ngIf="navigatingTo.nonSaleMode; then nonSaleModeLoading else nonSaleModeIcon">
+				</ng-container>
+				<ng-template #nonSaleModeIcon>
+					<i class="icon-tag"></i>
+				</ng-template>
+				<ng-template #nonSaleModeLoading>
+					<mat-progress-spinner [color]="white" [mode]="'indeterminate'" [diameter]="70">
+					</mat-progress-spinner>
+				</ng-template>
+				Non Sale Mode
+			</div>
+			<div matRipple class="dash-box sm-box blue-bg">
+				<ng-container *ngIf="navigatingTo.reportMode; then reportModeLoading else reportModeIcon">
+				</ng-container>
+				<ng-template #reportModeIcon>
+					<i class="icon-report"></i>
+				</ng-template>
+				<ng-template #reportModeLoading>
+					<mat-progress-spinner [color]="white" [mode]="'indeterminate'" [diameter]="70">
+					</mat-progress-spinner>
+				</ng-template>
+				Report Mode
+			</div>
+			<div matRipple class="dash-box sm-box purple-bg">
+				<ng-container *ngIf="navigatingTo.managerMode; then managerModeLoading else managerModeIcon">
+				</ng-container>
+				<ng-template #managerModeIcon>
+					<i class="icon-settings"></i>
+				</ng-template>
+				<ng-template #managerModeLoading>
+					<mat-progress-spinner [color]="white" [mode]="'indeterminate'" [diameter]="70">
+					</mat-progress-spinner>
+				</ng-template>
+				Manager Mode
+			</div>
+			<div (click)="navigatingTo.adminMode = true; enterAdminMode()" matRipple class="dash-box sm-box pink-bg">
+				<ng-container *ngIf="navigatingTo.adminMode; then adminModeLoading else adminModeIcon">
+				</ng-container>
+				<ng-template #adminModeIcon>
+					<i class="icon-user1"></i>
+				</ng-template>
+				<ng-template #adminModeLoading>
+					<mat-progress-spinner [color]="white" [mode]="'indeterminate'" [diameter]="70">
+					</mat-progress-spinner>
+				</ng-template>
+				Admin Mode
+			</div>
+		</div>
+	</div>
+</div>

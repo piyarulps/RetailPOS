@@ -1,0 +1,70 @@
+<form [formGroup]="myForm" (ngSubmit)="doManage()">
+	<div class="pop-heading" mat-dialog-title>{{dialogTitle}}
+		<div class="d-inline-flex">
+			<button type="button" mat-icon-button (click)="_dialogRef.close(false)"><i class="icon-cursor"></i></button>
+		</div>
+	</div>
+	<div mat-dialog-content>
+		<div class="row">
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Selling Rule</mat-label>
+					<mat-select formControlName="selling_rule_id">
+						<mat-option>
+							None
+						</mat-option>
+						<mat-option *ngFor="let SellingRule of SellingRuleList" [value]="SellingRule.id">
+							{{SellingRule.text}}
+						</mat-option>
+						<!-- <button mat-button color="primary" class="w-100 text-left"
+							(click)="addNewSellingRule()">Add New</button> -->
+					</mat-select>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Tax</mat-label>
+					<mat-select>
+						<mat-option value="option9" disabled>Select Tax</mat-option>
+						<mat-option value="option10">Option 1</mat-option>
+						<mat-option value="option11">Option 2</mat-option>
+						<mat-option value="option12">Option 3</mat-option>
+					</mat-select>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Min Inventory Level</mat-label>
+					<input matInput placeholder="Type Here" formControlName="min_inventory_level">
+					<mat-error *ngIf="f.min_inventory_level.errors?.pattern">
+						<span>Please enter integer value.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Max Inventory Level</mat-label>
+					<input matInput placeholder="Type Here" formControlName="max_inventory_level">
+					<mat-error *ngIf="f.max_inventory_level.errors?.pattern">
+						<span>Please enter integer value.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+			<div class="col-md-6 col-lg-6">
+				<mat-form-field appearance="outline">
+					<mat-label>Desired Inventory Level</mat-label>
+					<input matInput placeholder="Type Here" formControlName="desired_inventory_level">
+					<mat-error *ngIf="f.desired_inventory_level.errors?.pattern">
+						<span>Please enter integer value.</span>
+					</mat-error>
+				</mat-form-field>
+			</div>
+		</div>
+	</div>
+	<div mat-dialog-actions class="pop-footer">
+		<button mat-stroked-button class="ml-auto" cdkFocusInitial (click)="_dialogRef.close(false)"
+			type="button">Cancel</button>
+		<button mat-flat-button color="accent" cdkFocusInitial *ngIf="!editData.length">{{btnCreateTxt}}</button>
+		<button mat-flat-button color="accent" cdkFocusInitial *ngIf="editData.length">{{btnUpdateTxt}}</button>
+	</div>
+</form>

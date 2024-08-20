@@ -1,0 +1,94 @@
+<i class="icon-filter"></i>
+<div class="filter-clip">
+	<mat-chip-list aria-label="Fish selection">
+		<mat-chip *ngFor="let item of searchList;let i = index;" (click)="funReOpenDialog(i)" color="primary" selected>
+			{{item.originalcolumnname}}
+			<i [ngClass]="item.operator" class="mx-2"></i>{{item.dumytext}}<mat-icon (click)="funRemoveEle(item.field)"
+				matChipRemove class="icon-close"></mat-icon>
+		</mat-chip>
+	</mat-chip-list>
+	<div class="add-filter">
+		<button (click)="isFilterbarShow = !isFilterbarShow" mat-stroked-button color="primary"
+			(click)="isFilterbarShow = true;">
+			{{addFilterTxt}}
+		</button>
+		<div class="filter-list" [ngClass]="{'active':  isFilterbarShow}">
+			<div class="filter-heading">
+				Add New Filter
+				<button class="ml-auto" mat-icon-button (click)="isFilterbarShow = false;">
+					<i class="icon-cursor"></i>
+				</button>
+			</div>
+			<div class="filter-search">
+				<i class="icon-searching"></i>
+				<input [(ngModel)]="searchColumnName" type="text" placeholder="Search for...">
+			</div>
+			<div class="btn-list">
+				<button *ngFor="let column of allColumns | grdFilter: {name: searchColumnName}; let i = index;"
+					(click)="funOpenDialog(column.dbName,column.model)" mat-button>
+					<span *ngIf="column.filterDisplay">
+						{{column.name}}
+					</span>
+				</button>
+			</div>
+		</div>
+		<div class="filter-list" [ngClass]="{'active': isDropDown}">
+			<div class="filter-heading">
+				{{singlecolInfo.name}}
+				<button (click)="funClosePopup()" class="ml-auto" mat-icon-button>
+					<i class="icon-cursor"></i>
+				</button>
+			</div>
+			<form [formGroup]="addModuleForm" (ngSubmit)="onfilter(1)" #columnlistform="ngForm">
+				<div class="filter-body">
+					<div class="row al">
+						<div class="col-auto">
+							<button mat-icon-button [matMenuTriggerFor]="menu" type="button">
+								<i [ngClass]="defaulticon"></i>
+							</button>
+							<mat-menu #menu="matMenu">
+								<button *ngFor="let icon of singlecolInfo.condition;"
+									(click)="funChangeIcon(icon.class,icon.name)" mat-menu-item type="button">
+									<mat-icon [ngClass]="icon.class"></mat-icon>
+									<span>{{icon.displayname}}</span>
+								</button>
+							</mat-menu>
+						</div>
+						<div *ngIf="singlecolInfo.urlslookup!=null" class="col">
+							<ng-select
+								[ngClass]="{'ng-error': (f.value.touched || f.value.dirty || submitted) && f.value.errors?.required}"
+								[dropdownPosition]="'bottom'" [items]="filterDropDownList" bindLabel="text"
+								bindValue="id" placeholder="Select option" formControlName="value"
+								(change)="ngSelectedele($event)" [multiple]="true" appendTo="body">
+							</ng-select>
+							<mat-error *ngIf="(f.value.touched || f.value.dirty || submitted)">
+								<span *ngIf="f.value.errors?.required">Select any option.</span>
+							</mat-error>
+						</div>
+						<div *ngIf="(singlecolInfo.coltype=='Character' || singlecolInfo.coltype=='Text') && singlecolInfo.urlslookup == null"
+							class="col">
+							<mat-form-field appearance="outline">
+								<mat-label>{{singlecolInfo.name}}</mat-label>
+								<input matInput formControlName="value" (keyup)="getText($event)">
+							</mat-form-field>
+						</div>
+						<div *ngIf="(singlecolInfo.coltype=='Decimal' || singlecolInfo.coltype=='Integer') && singlecolInfo.urlslookup == null"
+							class="col">
+							<mat-form-field appearance="outline">
+								<mat-label>{{singlecolInfo.name}}</mat-label>
+								<input matInput formControlName="value" (keyup)="getText($event)">
+							</mat-form-field>
+						</div>
+					</div>
+				</div>
+				<div class="filter-action">
+					<button mat-flat-button color="primary" type="submit">Apply</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<button (click)="getColoumnList(receivedData.moduleName);getListingData();toggleFilter();" class="ml-auto"
+	mat-icon-button (click)="openFilter = false;">
+	<i class="icon-cursor"></i>
+</button>

@@ -1,0 +1,89 @@
+<form [formGroup]="myForm" (ngSubmit)="doManage()">
+	<div class="edit-view-heading">
+		<i class="icon-copy"></i>
+		{{dialogTitle}}
+		<button mat-icon-button (click)="onNoClick()" type="button" class="ml-auto"><i class="icon-cursor"></i></button>
+	</div>
+	<div class="edit-view-body">
+		<div class="">
+			<mat-form-field appearance="outline">
+				<mat-label>Site Id</mat-label>
+				<input matInput placeholder="Size" formControlName="siteId">
+				<mat-error *ngIf="(f.siteId.touched || f.siteId.dirty || submitted)">
+					<span *ngIf="f.siteId.errors?.required">Site Id is required.</span>
+				</mat-error>
+			</mat-form-field>
+		</div>
+		<div class="">
+			<ng-select placeholder="Timezone" [dropdownPosition]="'bottom'" [addTag]="true" [items]="timeZone"
+				bindLabel="text" bindValue="text" (clear)="clear()" appendTo="body" formControlName="timeZone">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new Timezone</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+		<div class="">
+			<ng-select placeholder="Site Type" [dropdownPosition]="'bottom'" [addTag]="true" [items]="siteType"
+				bindLabel="text" bindValue="id" (clear)="clear()" appendTo="body" formControlName="siteType"
+				(change)="onSiteTypeChange($event)">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new Site Type</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+		<div class="">
+			<ng-select placeholder="Retail Site Type" [dropdownPosition]="'bottom'" [addTag]="true"
+				[items]="retailSiteTypeCode" bindLabel="text" bindValue="text" (clear)="clear()" appendTo="body"
+				formControlName="retailSiteType">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new Retail Site Type</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+
+		<div class="">
+			<mat-form-field appearance="outline">
+				<mat-label>Site North Angle Offset Degree</mat-label>
+				<input matInput placeholder="Site North Angle Offset Degree"
+					formControlName="siteNorthAngleOffsetDegree">
+				<mat-error
+					*ngIf="(f.siteNorthAngleOffsetDegree.touched || f.siteNorthAngleOffsetDegree.dirty || submitted)">
+					<span *ngIf="f.siteNorthAngleOffsetDegree.errors">Site North Angle Offset Degree is invalid.</span>
+				</mat-error>
+			</mat-form-field>
+		</div>
+		<div class="">
+			<ng-select placeholder="Location" [dropdownPosition]="'bottom'" [addTag]="true" [multiple]="true"
+				[items]="locationList" bindLabel="text" bindValue="id" (clear)="clear()" appendTo="body"
+				formControlName="location">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new Location</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+		<div class="">
+			<ng-select placeholder="Opearational Party" [dropdownPosition]="'bottom'" [addTag]="true" [multiple]="false"
+				[items]="operatingParty" bindLabel="text" bindValue="id" (clear)="clear()" appendTo="body"
+				(change)="onOperationPartyChange($event)" formControlName="operationParty">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new Opearational Party</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+		<div class="">
+			<ng-select placeholder="Business Unit" [dropdownPosition]="'bottom'" [addTag]="false" [multiple]="true"
+				[items]="businessUnitList" bindLabel="text" bindValue="id" (clear)="clear()" appendTo="body"
+				formControlName="businessUnit">
+				<ng-template ng-tag-tmp let-search="searchTerm">
+					<b [ngStyle]="{'color': '#0000FF'}">Add new Business Unit</b>: {{search}}
+				</ng-template>
+			</ng-select>
+		</div>
+	</div>
+	<div class="edit-view-footer full-btn">
+		<button mat-flat-button color="accent" cdkFocusInitial *ngIf="!editData.length"
+			[disabled]="isbtnLoaderShow">{{btnCreateTxt}}</button>
+		<button mat-flat-button color="accent" cdkFocusInitial *ngIf="editData.length"
+			[disabled]="isbtnLoaderShow">{{btnUpdateTxt}}</button>
+	</div>
+</form>

@@ -1,0 +1,129 @@
+<form [formGroup]="addModuleForm" (ngSubmit)="doManage()">
+  <div class="edit-view-heading">
+    <i class="icon-copy"></i>
+    {{dialogTitle}}
+    <!-- <button mat-icon-button (click)="onNoClick()" type="button" class="ml-auto"><i class="icon-cursor"></i></button> -->
+  </div>
+  <div class="edit-view-body">
+    <div [hidden]="editData.length > 1">
+      <ng-select [ngClass]="{'ng-error':(f.type.touched || f.type.dirty || submitted) && f.type.errors?.required}"
+        placeholder="Select Type *" [dropdownPosition]="'bottom'" [addTag]="true" appendTo="body" [items]="uomList"
+        bindLabel="text" bindValue="id" (change)="onTypeChange($event)" (clear)="clear()" formControlName="type">
+        <ng-template ng-tag-tmp let-search="searchTerm">
+          <b [ngStyle]="{'color': '#0000FF'}">Add new Type</b>: {{search}}
+        </ng-template>
+      </ng-select>
+      <mat-error *ngIf="(f.type.touched || f.type.dirty || submitted)">
+        <span *ngIf="f.type.errors?.required">Select Type .</span>
+      </mat-error>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Metric Type</mat-label>
+        <mat-select formControlName="metricType">
+          <mat-option value="1">English</mat-option>
+          <mat-option value="2">Metric</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <ng-select
+      [ngClass]="{'ng-error':(f.unitOfMeasurementCode.touched || f.unitOfMeasurementCode.dirty || submitted || openDialogToggle) && f.unitOfMeasurementCode.errors?.required}"
+      placeholder="Select Unit of measurement code *" [dropdownPosition]="'bottom'" [addTag]="true" appendTo="body"
+      [items]="unitofMeasureCodeForType" bindLabel="text" bindValue="text" (clear)="clear()"
+      formControlName="unitOfMeasurementCode">
+      <ng-template ng-tag-tmp let-search="searchTerm">
+        <b [ngStyle]="{'color': '#0000FF'}">Add new Unit of measurement code</b>: {{search}}
+      </ng-template>
+    </ng-select>
+    <mat-error
+      *ngIf="( openDialogToggle || submitted || f.unitOfMeasurementCode.touched || f.unitOfMeasurementCode.dirty )">
+      <span *ngIf="f.unitOfMeasurementCode.errors">Select unit of measurement code .</span>
+    </mat-error>
+    <!-- <mat-form-field appearance="outline">
+      <mat-label>Unit of measurement code</mat-label>
+      <mat-select formControlName="unitOfMeasurementCode"  (selectionChange)="unitofMeasureCodeChange($event)">
+        <mat-option *ngFor="let unitofMeasureCode of unitofMeasureCodeForType"  [disabled]="unitofMeasureCodeSelectedSelectedArray.includes(unitofMeasureCode.text)" [value]="unitofMeasureCode.text">
+          {{unitofMeasureCode.text}}</mat-option>
+      </mat-select>
+      <mat-error *ngIf="(f.unitOfMeasurementCode.touched || f.unitOfMeasurementCode.dirty || submitted)">
+        <span *ngIf="f.unitOfMeasurementCode.errors?.required">Select unit of measurement code .</span>
+      </mat-error>
+    </mat-form-field> -->
+    <mat-form-field appearance="outline">
+      <mat-label>Name *</mat-label>
+      <input formControlName="name" matInput placeholder="Name">
+      <mat-error *ngIf="(f.name.touched || f.name.dirty || submitted)">
+        <span *ngIf="f.name.errors?.required">Enter Name.</span>
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <textarea formControlName="descripition" matInput placeholder="Description"></textarea>
+    </mat-form-field>
+    <div class="edit-view-heading">Conversion Unit</div>
+    <div class="edit-view-body">
+      <div class="row">
+        <div class="col">
+          <p>
+            <ng-container *ngFor="let item of measurementData; let i=index ">
+              {{ i != 0 ? ",":''}}1{{f.unitOfMeasurementCode.value}}{{item.number}}{{item.type}}
+            </ng-container>
+            <ng-container *ngFor="let item of measurementDataForUpdate; let i=index ">
+              {{ i != 0 ? ",":''}}1{{f.unitOfMeasurementCode.value}}{{item.Amount}}{{item.ConvertsToName}}
+            </ng-container>
+          </p>
+        </div>
+        <div class="col-auto">
+          <i class="icon-pencil" (click)="openDialog()"></i>
+        </div>
+      </div>
+    </div>
+    <!-- <div formArrayName="itemRows">
+      <div *ngFor="let itemrow of addModuleForm.controls.itemRows['controls']; let i=index" [formGroupName]="i">
+        <div class="row gutter-10 align-items-center">
+          <div class="col-sm-2">
+            <div class="form-group">
+              1 {{ addModuleForm.value.unitOfMeasurementCode}}<i class="icon-equals ml-2"></i>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Number</mat-label>
+              <input matInput placeholder="Number" formControlName="number">
+              <mat-error
+                *ngIf="(formArr.controls[i].controls.number.touched ||formArr.controls[i].controls.number.dirty || submitted)">
+                <span *ngIf="formArr.controls[i].controls.number.errors">Enter valid Number .</span>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-sm-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Select Type</mat-label>
+              <mat-select formControlName="type" [disabled]="!f.unitOfMeasurementCode.value" (selectionChange)="unitofMeasureCodeTypeChange($event)">
+                <mat-option *ngFor="let unitofMeasureCode of unitofMeasureCodeForType"  [disabled]="unitofMeasureCodeSelectedSelectedArray.includes(unitofMeasureCode.text)" [value]="unitofMeasureCode.text">
+                  {{unitofMeasureCode.text}}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-sm-2">
+            <div class="form-group">
+              <button type="button" mat-stroked-button *ngIf="addModuleForm.controls.itemRows.controls.length > 1"
+                (click)="deleteRow(i)" class="btn-box">
+                <i class="rubbish-bin"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button type="button" mat-stroked-button (click)="addNewRow()" color="primary">Add More</button>
+    </div> -->
+
+
+  </div>
+  <div class="edit-view-footer">
+    <button type="button" mat-button color="accent" cdkFocusInitial class="ml-auto"
+      (click)="onNoClick()">Cancel</button>
+    <button mat-flat-button color="accent" cdkFocusInitial *ngIf="!editData.length"
+      [disabled]="isbtnLoaderShow">{{btnCreateTxt}}</button>
+    <button mat-flat-button color="accent" cdkFocusInitial *ngIf="editData.length"
+      [disabled]="isbtnLoaderShow">{{btnUpdateTxt}}</button>
+  </div>
+</form>

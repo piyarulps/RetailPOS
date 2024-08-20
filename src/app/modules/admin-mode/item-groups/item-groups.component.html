@@ -1,0 +1,281 @@
+<div class="">
+	<app-header-sidebar [pageData]="pageData" (getCommonData)="getCommonData($event)"></app-header-sidebar>
+	<section class="wraper" [ngClass]="{'open-nav': isNavOpen}">
+		<div class="table-wraper">
+			<div class="table-action">
+
+				<div class="row align-items-center">
+					<div class="col order-2 order-md-1 d-flex">
+						<button color="primary" mat-flat-button class="d-none d-lg-block"
+							(click)="headerSidebarComponent.add()"><i class="icon-plus mr-2"></i> Add New</button>
+						<button mat-flat-button class="d-lg-none btn-box" (click)="headerSidebarComponent.add()"><i
+								class="icon-plus"></i></button>
+
+						<button color="accent" *ngIf="this.selectedList.length" mat-flat-button
+							class="d-none d-lg-block" (click)="delete()"><i class="icon-rubbish-bin mr-2"></i>
+							Delete</button>
+						<button *ngIf="this.selectedList.length" mat-flat-button class="d-lg-none btn-box"
+							(click)="delete()"><i class="icon-rubbish-bin"></i></button>
+
+						<button color="accent" *ngIf="this.selectedList.length" mat-flat-button
+							class="d-none d-lg-block" (click)="status(1)"><i class="icon-unlock1 mr-2"></i>
+							Enable</button>
+						<button *ngIf="this.selectedList.length" mat-flat-button class="d-lg-none btn-box"
+							(click)="status(1)"><i class="icon-unlock1"></i></button>
+
+						<button color="accent" *ngIf="this.selectedList.length" mat-flat-button
+							class="d-none d-lg-block" (click)="status(0)"><i class="icon-padlock mr-2"></i>
+							Disable</button>
+						<button *ngIf="this.selectedList.length" mat-flat-button class="d-lg-none btn-box"
+							(click)="status(0)"><i class="icon-padlock"></i></button>
+					</div>
+					<!-- <div class="col-12 col-md-auto ml-auto order-1 order-md-2">
+							<div class="search-box">
+								<i class="icon-searching"></i>
+								<input type="text" placeholder="Search for...">
+							</div>
+						</div> -->
+					<div class="col-auto ml-auto order-2 order-md-3 d-flex">
+						<button color="accent" mat-stroked-button class="d-none d-lg-block"
+							(click)="headerSidebarComponent.toggleFilter()"><i class="icon-funnel mr-2"></i>
+							Filter</button>
+						<button mat-stroked-button class="d-lg-none btn-box"
+							(click)="headerSidebarComponent.toggleFilter()"><i class="icon-funnel"></i></button>
+
+						<button color="accent" mat-stroked-button class="d-none d-lg-block"
+							(click)="headerSidebarComponent.toggleColumns()"><i class="icon-list mr-2"></i>
+							Column</button>
+						<button mat-stroked-button class="d-lg-none btn-box"
+							(click)="headerSidebarComponent.toggleColumns()"><i class="icon-list"></i></button>
+					</div>
+				</div>
+			</div>
+			<div class="filter-box" [ngClass]="{'active':  filterData.openFilter}">
+				<app-filter class="app-filter" [pageData]="filterData" (getCommonData)="getCommonData($event)">
+				</app-filter>
+			</div>
+			<mat-progress-bar [hidden]="!isLoading" mode="indeterminate" color="accent">
+			</mat-progress-bar>
+
+			<div class="table-list">
+				<table mat-table [dataSource]="dataSource" class="mat-elevation-z8 disable-text-selection" matSort
+					(matSortChange)="sortData($event)">
+					<ng-container matColumnDef="select">
+						<th mat-header-cell *matHeaderCellDef class="check-box" [hidden]="true">
+							<mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+								[checked]="selection.hasValue() && isAllSelected()"
+								[indeterminate]="selection.hasValue() && !isAllSelected()"
+								[aria-label]="checkboxLabel()" #masterCheckbox>
+							</mat-checkbox>
+						</th>
+						<td mat-cell *matCellDef="let row" class="check-box" [hidden]="true">
+							<mat-checkbox color="primary" (click)="$event.stopPropagation()"
+								(change)="$event ? setSelect(row) : null" [checked]="selection.isSelected(row)"
+								[aria-label]="checkboxLabel(row)">
+							</mat-checkbox>
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="POSItemID">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Product # </th>
+						<td mat-cell *matCellDef="let item" data-label="Product #">
+							{{item.business_unit_group_item[0]?.site_identity[0]?.POSItemID}}
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="Description">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Description </th>
+						<td mat-cell *matCellDef="let item" data-label="Description"> {{item.Description}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="LongDescription">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Long Description </th>
+						<td mat-cell *matCellDef="let item" data-label="LongDescription"> {{item.LongDescription}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="BrandName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Brand </th>
+						<td mat-cell *matCellDef="let item" data-label="Brand Name">
+							<div>{{ (item.BrandName === null) ? '--' : item.BrandName.BrandName }}</div>
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="TableName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Size </th>
+						<td mat-cell *matCellDef="let item" data-label="Size"> {{item?.size}}
+							<!-- {{item._source.Size}} -->
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="CurrentPackagePrice">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Current Price </th>
+						<td mat-cell *matCellDef="let item" data-label="Current Price">
+							{{(item.ItemSellingPrices != 'undefined' && item.ItemSellingPrices != null) ? item.ItemSellingPrices.CurrentPackagePrice : '--'}}
+							<!-- {{item._source.Description}} -->
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="cost">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Current Cost </th>
+						<td mat-cell *matCellDef="let item" data-label="Current Cost">
+							{{(item.ItemSellingPrices != 'undefined' && item.ItemSellingPrices != null) ? item.ItemSellingPrices.cost : '--'}}
+							<!-- {{item._source.Count}} -->
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="qty_on_hand">
+						<th mat-header-cell *matHeaderCellDef> Qty. On Hand </th>
+						<td mat-cell *matCellDef="let item" data-label="Qty. On Hand"> {{item.qty_on_hand}}
+							<!-- {{item._source.Count}} -->
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="qty_in_case">
+						<th mat-header-cell *matHeaderCellDef> Qty. in Case </th>
+						<td mat-cell *matCellDef="let item" data-label="Qty. in Case">{{item.qty_in_case}}
+							<!-- {{item._source.Count}} -->
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="profit">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Profit </th>
+						<td mat-cell *matCellDef="let item" data-label="Profit">
+							{{(item.ItemSellingPrices != 'undefined' && item.ItemSellingPrices != null) ? item.ItemSellingPrices.profit :'--'}}
+							<!-- {{item._source.Count}} -->
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="margin">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Margin </th>
+						<td mat-cell *matCellDef="let item" data-label="Margin">
+							{{(item.ItemSellingPrices != 'undefined' && item.ItemSellingPrices != null) ? item.ItemSellingPrices.margin :'--'}}
+							<!-- {{item._source.Count}} -->
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="ItemSellingRule">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Selling Rule Name</th>
+						<td mat-cell *matCellDef="let item" data-label="Margin">
+							{{(item.ItemSellingRule != 'undefined' && item.ItemSellingRule != null) ? item.ItemSellingRule.SellingRuleName :'--'}}
+							<!-- {{item._source.Count}} -->
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="ManufacturerSaleUnitRecommendedRetailPriceAmount">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Msrp </th>
+						<td mat-cell *matCellDef="let item" data-label="Msrp">
+							{{(item.ItemSellingPrices != 'undefined' && item.ItemSellingPrices != null) ? item.ItemSellingPrices.ManufacturerSaleUnitRecommendedRetailPriceAmount :'--'}}
+							<!-- {{item._source.Count}} -->
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="selling_price_type">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Selling Price Type </th>
+						<td mat-cell *matCellDef="let item" data-label="Selling Price Type">
+							{{(item.ItemSellingPrices != 'undefined' && item.ItemSellingPrices != null) ? item.ItemSellingPrices.selling_price_type :'--'}}
+							<!-- {{item._source.Count}} -->
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="POSDepartment">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Department Name
+						</th>
+						<td mat-cell *matCellDef="let item" data-label="Margin">
+							{{(item.POSDepartment != 'undefined' && item.POSDepartment != null) ? item.POSDepartment.POSDepartmentName :'--'}}
+							<!-- {{item._source.Count}} -->
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="ABV">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> ABV </th>
+						<td mat-cell *matCellDef="let item" data-label="ABV">
+							{{(item.ABV != 'undefined' && item.ABV != null) ? item.ABV :'--'}}
+							<!-- {{item._source.Count}} -->
+						</td>
+					</ng-container>
+
+					<ng-container matColumnDef="KitSetCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Kit Set Code </th>
+						<td mat-cell *matCellDef="let item" data-label="KitSetCode"> {{item.KitSetCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="TypeCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+						<td mat-cell *matCellDef="let item" data-label="TypeCode"> {{item.TypeCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="TaxExemptCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Tax Exempt Code </th>
+						<td mat-cell *matCellDef="let item" data-label="TaxExemptCode"> {{item.TaxExemptCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="UsageCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Usage Code </th>
+						<td mat-cell *matCellDef="let item" data-label="UsageCode"> {{item.UsageCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="OrderCollectionCode">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> Order Collection Code </th>
+						<td mat-cell *matCellDef="let item" data-label="OrderCollectionCode">
+							{{item.OrderCollectionCode}} </td>
+					</ng-container>
+
+					<ng-container matColumnDef="SupplierName">
+						<th mat-header-cell *matHeaderCellDef mat-sort-header> supplier </th>
+						<td mat-cell *matCellDef="let item" data-label="OrderCollectionCode">
+							{{(item.supplier != 'undefined' && item.supplier != null)?item.supplier[0]:''}}
+							<a>
+								{{(item.supplier != 'undefined' && item.supplier != null)?(item.supplier?.length>1)?(item.supplier.length-1)+'more':'':''}}
+							</a>
+						</td>
+					</ng-container>
+
+					<ng-container *ngFor="let column of functionListForDisplaycol;let i=index;"
+						matColumnDef="{{column.value}}">
+						<th mat-header-cell *matHeaderCellDef>{{column.header_name}}</th>
+						<td mat-cell *matCellDef="let item"> {{item[column.value]}} </td>
+					</ng-container>
+
+					<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+					<tr mat-row *matRowDef="let row; columns: displayedColumns; let i = index;"
+						[ngClass]="{'active': selection.isSelected(row)}" (click)="setSelectClick(row, $event)"
+						(mousedown)="setSelectMD(i)" (mouseup)="setSelectMU(i)"></tr>
+				</table>
+				<div *ngIf="!dataSource.data.length && !isLoading" class="no-data text-center">
+					<a href="javascript:void(0)" (click)="headerSidebarComponent.add()">CLICK HERE</a> to add a
+					{{displayModuleName}}
+				</div>
+				<mat-paginator [hidden]="!dataSource.data.length" [pageSizeOptions]="paginationSetup.pageLimitOptions"
+					[pageSize]="paginationSetup.pageLimit" [length]="paginationSetup.totalRecord" showFirstLastButtons>
+				</mat-paginator>
+			</div>
+		</div>
+		<div class="edit-view list-view" [ngClass]="{'active': !openSidebar}">
+			<div>
+				<div class="edit-view-heading">Item Groups Name</div>
+				<div class="edit-view-body">
+					<ul class="gr-list">
+						<li [ngClass]="{'active': GroupItemID == GroupItem.id }"
+							*ngFor="let GroupItem of GroupItemList">
+							<span (click)="getHierarchy(GroupItem.id)">{{GroupItem.Description}}</span>
+							<i class="icon-more" [matMenuTriggerFor]="menu"></i>
+							<mat-menu #menu="matMenu">
+								<button mat-menu-item (click)="edit(GroupItem.id)">
+									Edit
+								</button>
+								<button mat-menu-item (click)="deleteGroupItem('delete','y',1,GroupItem.id)">
+									Delete
+								</button>
+							</mat-menu>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="edit-view" [ngClass]="{'active': openSidebar}">
+			<app-item-groups-manage [pageData]="editData" (getCommonData)="getCommonData($event)">
+			</app-item-groups-manage>
+		</div>
+	</section>
+
+</div>

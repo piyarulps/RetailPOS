@@ -1,0 +1,82 @@
+<!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
+<div class="pop-heading" mat-dialog-title>{{dialogTitle}}
+	<div class="d-inline-flex">
+		<button type="button" mat-icon-button (click)="_dialogRef.close(false)"><i class="icon-cursor"></i></button>
+	</div>
+</div>
+<div mat-dialog-content>
+	<div [hidden]="!isLoading" class="loader-bg">
+		<mat-spinner></mat-spinner>
+	</div>
+	<div class="list-box" [hidden]="isLoading">
+		<div class="tree-view">
+			<!-- <mat-accordion multi="true"> -->
+			<mat-expansion-panel *ngFor="let MerchandiseFunction of MerchandiseFunctionList;let i=index"
+				[expanded]="MerchandiseFunction.ismatepandable" (opened)="getTreeView(MerchandiseFunction.id)">
+				<mat-expansion-panel-header>
+					{{MerchandiseFunction.hierarchy_function_name}}
+					<span
+						*ngIf="merchandiseSelectedNode[MerchandiseFunction.id]!=0">{{'('+merchandiseSelectedNode[MerchandiseFunction.id]+')'}}</span>
+				</mat-expansion-panel-header>
+				<mat-tree #tree [dataSource]="merchandiseTreedata[MerchandiseFunction.id]"
+					[treeControl]="merchandiseTreeControl[MerchandiseFunction.id]" class="example-tree">
+					<!-- <ul> -->
+					<!-- This is the tree node template for leaf nodes -->
+					<mat-tree-node *matTreeNodeDef="let node;let i=index;" matTreeNodeToggle>
+						<li class="mat-tree-node">
+							<!-- use a disabled button to provide padding for tree leaf -->
+							<div class="tree-arrow">
+								<button mat-icon-button disabled></button>
+							</div>
+							<ng-container *ngIf="node.is_parent!='y';else plaintext">
+								<mat-checkbox class="checklist-leaf-node"
+									[checked]="checklistSelection.isSelected(node)"
+									(change)="todoLeafItemSelectionToggle(node)">
+									{{node.name}}</mat-checkbox>
+							</ng-container>
+							<ng-template #plaintext>
+								<span>{{node.name}}</span>
+							</ng-template>
+						</li>
+					</mat-tree-node>
+					<!-- This is the tree node template for expandable nodes -->
+					<mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild;let i=index;">
+						<li>
+							<div class="mat-tree-node">
+								<div class="tree-arrow">
+									<button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + node.name">
+										<i
+											class="{{merchandiseTreeControl[MerchandiseFunction.id].isExpanded(node) ? 'icon-down-arrow' : 'icon-right-arrow'}}">
+										</i>
+									</button>
+								</div>
+								<ng-container *ngIf="node.is_parent!='y';else plaintext">
+									<mat-checkbox class="checklist-leaf-node"
+										[checked]="checklistSelection.isSelected(node)"
+										(change)="todoLeafItemSelectionToggle(node)">
+										{{node.name}}</mat-checkbox>
+								</ng-container>
+								<ng-template #plaintext>
+									<span>{{node.name}}</span>
+								</ng-template>
+							</div>
+							<ul
+								[class.example-tree-invisible]="!merchandiseTreeControl[MerchandiseFunction.id].isExpanded(node)">
+								<ng-container matTreeNodeOutlet></ng-container>
+							</ul>
+						</li>
+					</mat-nested-tree-node>
+					<!-- </ul> -->
+				</mat-tree>
+			</mat-expansion-panel>
+			<!-- </mat-accordion> -->
+		</div>
+	</div>
+</div>
+<div mat-dialog-actions class="pop-footer">
+	<button mat-stroked-button class="ml-auto" cdkFocusInitial (click)="_dialogRef.close(false)">Cancel</button>
+	<button mat-flat-button color="accent" cdkFocusInitial (click)="doManage()"
+		*ngIf="!editData.length">{{btnCreateTxt}}</button>
+	<button mat-flat-button color="accent" cdkFocusInitial (click)="doManage()"
+		*ngIf="editData.length">{{btnUpdateTxt}}</button>
+</div>

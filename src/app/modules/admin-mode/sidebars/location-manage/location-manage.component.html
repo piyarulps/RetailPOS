@@ -1,0 +1,157 @@
+<form [formGroup]="addModuleForm" (ngSubmit)="doManage()">
+  <div class="edit-view-heading">
+    <i class="icon-copy"></i>
+    {{dialogTitle}}
+    <button mat-icon-button (click)="onNoClick()" type="button" class="ml-auto"><i class="icon-cursor"></i></button>
+  </div>
+  <div class="edit-view-body">
+
+    <div class="">
+      <mat-form-field appearance="outline">
+        <mat-label>Name*</mat-label>
+        <input matInput formControlName="locationText">
+        <mat-error *ngIf="(f.locationText.touched || f.locationText.dirty || submitted)">
+          <span *ngIf="f.locationText.errors?.required">Name is required.</span>
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div class="">
+      <ng-select placeholder="Parent Location" [dropdownPosition]="'bottom'" [addTag]="false"
+        [items]="parentLocationList" bindLabel="text" bindValue="id" appendTo="body"
+        formControlName="parentLocationID">
+        <ng-template ng-tag-tmp let-search="searchTerm">
+          <b [ngStyle]="{'color': '#0000FF'}">Add new Parent Location</b>: {{search}}
+        </ng-template>
+      </ng-select>
+    </div>
+    <div class="">
+      <ng-select placeholder="Location Group" [dropdownPosition]="'bottom'" [addTag]="true"
+        (change)="onLocationGroupChange($event)" [items]="locationGroupList" bindLabel="text" bindValue="id"
+        appendTo="body" formControlName="locationGroup">
+        <ng-template ng-tag-tmp let-search="searchTerm">
+          <b [ngStyle]="{'color': '#0000FF'}">Add new Location Group</b>: {{search}}
+        </ng-template>
+      </ng-select>
+    </div>
+    <div class="">
+      <ng-select placeholder="Location Type" [dropdownPosition]="'bottom'" [addTag]="true"
+        (change)="onLocationTypeChange($event)" [items]="LocationTypeList" bindLabel="text" bindValue="id"
+        appendTo="body" formControlName="locationType">
+        <ng-template ng-tag-tmp let-search="searchTerm">
+          <b [ngStyle]="{'color': '#0000FF'}">Add new Location Type</b>: {{search}}
+        </ng-template>
+      </ng-select>
+    </div>
+    <div [hidden]=true>
+      <ng-select placeholder="Location Level" [dropdownPosition]="'bottom'" [addTag]="true"
+        [items]="LocationLevelList" bindLabel="text" bindValue="id" (change)="onLocationLevelChange($event)"
+        appendTo="body" formControlName="locationLevel">
+        <ng-template ng-tag-tmp let-search="searchTerm">
+          <b [ngStyle]="{'color': '#0000FF'}">Add new Location Level</b>: {{search}}
+        </ng-template>
+      </ng-select>
+    </div>
+    <div class="">
+      <ng-select placeholder="Unit of Measurement code" [dropdownPosition]="'bottom'" [addTag]="false"
+        [items]="MeasurementCodeList" bindLabel="text" bindValue="id" appendTo="body"
+        formControlName="measurementCode">
+      </ng-select>
+    </div>
+    <div class="">
+      <mat-form-field appearance="outline">
+        <mat-label>Size Quantity</mat-label>
+        <input matInput formControlName="sizeQuantity">
+        <mat-error *ngIf="(f.sizeQuantity.touched || f.sizeQuantity.dirty || submitted)">
+          <span *ngIf="f.sizeQuantity.errors">Size Quantity is Invalid.</span>
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div class="">
+      <ng-select placeholder="Business Site Id" [dropdownPosition]="'bottom'" [addTag]="false"
+        [items]="BusinessSiteIdList" bindLabel="text" bindValue="id" appendTo="body"
+        formControlName="businessSiteId">
+        <ng-template ng-tag-tmp let-search="searchTerm">
+          <b [ngStyle]="{'color': '#0000FF'}">Add new Business Site Id</b>: {{search}}
+        </ng-template>
+      </ng-select>
+    </div>
+    <div class="" >
+
+        <mat-form-field appearance="outline">
+            <mat-label>Location Function</mat-label>
+            <mat-select formControlName="locationFunction" [disabled]="checkLocationFunction" >
+              <mat-option *ngFor="let data of LocationFunctionList" [value]="data.id">
+                {{data.text}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+
+      <!-- <ng-select [disabled]="checkTypeCode" placeholder="Location Function" [dropdownPosition]="'bottom'" [addTag]="true"
+        [items]="LocationFunctionList " bindLabel="text" bindValue="id" appendTo="body"
+        formControlName="locationFunction">
+        <ng-template ng-tag-tmp let-search="searchTerm">
+          <b [ngStyle]="{'color': '#0000FF'}">Add new Location Function</b>: {{search}}
+        </ng-template>
+      </ng-select> -->
+    </div>
+    <div class="" *ngIf="addModuleForm.controls.locationFunction.value =='InventoryLocation'">
+      <mat-form-field appearance="outline">
+        <mat-label>Function Code</mat-label>
+        <input matInput formControlName="functionCode">
+      </mat-form-field>
+    </div>
+    <div class="" *ngIf="addModuleForm.controls.locationFunction.value =='InventoryLocation'">
+      <mat-form-field appearance="outline">
+        <mat-label>Security Class Code</mat-label>
+        <input matInput formControlName="securityClassCode">
+      </mat-form-field>
+    </div>
+    <div class="" *ngIf="addModuleForm.controls.locationFunction.value =='NonSellingPublicArea'">
+      <mat-form-field appearance="outline">
+        <mat-label>Non Selling Public Area Description</mat-label>
+        <input matInput formControlName="nonSellingPublicAreaDescripition">
+      </mat-form-field>
+    </div>
+    <div class="" *ngIf="addModuleForm.controls.locationFunction.value =='SellingLocation'">
+      <ng-select placeholder="Business Unit Id" [dropdownPosition]="'bottom'" [addTag]="false"
+        [items]="businessUnitList " bindLabel="text" bindValue="id" appendTo="body"
+        formControlName="businessUnitId">
+        <ng-template ng-tag-tmp let-search="searchTerm">
+          <b [ngStyle]="{'color': '#0000FF'}">Add new Business Unit Id</b>: {{search}}
+        </ng-template>
+      </ng-select>
+    </div>
+    <div class="" *ngIf="addModuleForm.controls.locationFunction.value =='SellingLocation'">
+      <mat-form-field appearance="outline">
+        <mat-label>Size</mat-label>
+        <input matInput formControlName="size">
+      </mat-form-field>
+    </div>
+    <div class="" *ngIf="addModuleForm.controls.locationFunction.value =='SellingLocation'">
+      <ng-select placeholder="Vender Id" [dropdownPosition]="'bottom'" [addTag]="false"
+        [items]="venderList " bindLabel="text" bindValue="id" appendTo="body" formControlName="venderId">
+        <ng-template ng-tag-tmp let-search="searchTerm">
+          <b [ngStyle]="{'color': '#0000FF'}">Add new Vender Id</b>: {{search}}
+        </ng-template>
+      </ng-select>
+    </div>
+    <div class="" *ngIf="addModuleForm.controls.locationFunction.value =='WorkLocation'">
+      <ng-select placeholder="Work Location Business Unit" [dropdownPosition]="'bottom'" [addTag]="false"
+        [items]="businessUnitList " bindLabel="text" bindValue="id" appendTo="body"
+        formControlName="workLocationBusinessUnit">
+        <ng-template ng-tag-tmp let-search="searchTerm">
+          <b [ngStyle]="{'color': '#0000FF'}">Add new Work Location Business Unit</b>: {{search}}
+        </ng-template>
+      </ng-select>
+    </div>
+
+
+  </div>
+  <div class="edit-view-footer full-btn">
+    <button mat-flat-button color="accent" cdkFocusInitial *ngIf="!editData.length"
+      [disabled]="isbtnLoaderShow">{{btnCreateTxt}}</button>
+    <button mat-flat-button color="accent" cdkFocusInitial *ngIf="editData.length"
+      [disabled]="isbtnLoaderShow">{{btnUpdateTxt}}</button>
+  </div>
+</form>
